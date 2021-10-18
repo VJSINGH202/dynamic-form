@@ -34,7 +34,7 @@
 		</div>
 	</nav>
 	<div class="container mt-5 mx-auto">
-		<form:form action="dynamic/generate" modelAttribute="dynamicForm" method="GET">
+		<form:form action="dynamic/list" modelAttribute="dynamicForm" method="POST">
 			<div class="mb-3">
 				<form:select class="form-select" aria-label="Default select example" path="className">
 				    <option disabled="disabled">Choose a ClassName</option>

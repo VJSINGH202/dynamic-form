@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.adject.dynamicform.modal.DynamicForm;
@@ -56,7 +57,29 @@ public class DynamicFormController {
 
 	@GetMapping("/generate")
 	public String getForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
-		model.addAttribute("className", dynamicForm.getClassName());
+		//model.addAttribute("className", dynamicForm.getClassName());
 		return "form";
 	}
+	
+	@PostMapping("/list")
+	public String getList(@ModelAttribute DynamicForm dynamicForm, Model model) {
+		model.addAttribute("className", dynamicForm.getClassName());
+		return "list";
+	}
+	
+	@GetMapping(value="/load",produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody String loadJson(@RequestParam("className") String className) {
+		
+	//	System.out.println("className inside loadjson method"+className);
+	
+//		JetFormWrapper form = formRenderer.getForm(className);
+//		System.out.println("form"+form);
+		String formJson = jetFormService.getFormJson(className);
+//		Gson gson=new Gson();
+//		String json = gson.toJson(form);
+//		System.out.println("Json:  "+json);
+//		model.addAttribute("form", form);
+//		model.addAttribute("json",json);
+		return formJson;
+	}  
 }
