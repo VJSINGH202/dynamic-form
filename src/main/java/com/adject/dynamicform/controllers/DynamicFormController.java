@@ -1,5 +1,7 @@
 package com.adject.dynamicform.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -70,16 +72,21 @@ public class DynamicFormController {
 	@GetMapping(value="/load",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody String loadJson(@RequestParam("className") String className) {
 		
-	//	System.out.println("className inside loadjson method"+className);
-	
 //		JetFormWrapper form = formRenderer.getForm(className);
-//		System.out.println("form"+form);
 		String formJson = jetFormService.getFormJson(className);
 //		Gson gson=new Gson();
 //		String json = gson.toJson(form);
-//		System.out.println("Json:  "+json);
 //		model.addAttribute("form", form);
 //		model.addAttribute("json",json);
 		return formJson;
-	}  
+	}
+
+	@GetMapping(value="/list",produces= MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody String getList(@RequestParam("className") String className) {
+		System.out.println("inside list"+className);
+		Gson gson=new Gson();
+		String json = gson.toJson(jetFormService.getList(className));
+		System.out.println("Json:"+json);
+		return json;
+	}
 }
