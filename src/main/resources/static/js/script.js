@@ -5,6 +5,7 @@ $(document).ready(function() {
 
 const getClassName = function(){
     console.log('getting classname : ');
+    //it searches the parameter in query string 
     var urlParams = new URLSearchParams(window.location.search);
     console.log(urlParams.has('className')); 
     

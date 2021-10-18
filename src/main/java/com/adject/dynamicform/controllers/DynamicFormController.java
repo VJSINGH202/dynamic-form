@@ -57,7 +57,7 @@ public class DynamicFormController {
 
 	@GetMapping("/generate")
 	public String getForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
-		model.addAttribute("className", dynamicForm.getClassName());
+		//model.addAttribute("className", dynamicForm.getClassName());
 		return "form";
 	}
 	
