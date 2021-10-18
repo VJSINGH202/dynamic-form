@@ -16,12 +16,7 @@
 	<div class="container">
 		<div class="row justify-content-md-center"">
 			<div class="col-sm-6">
-			<div id="jetForm">
-			</div>
-				<!-- <div class="card">
-					<div class="card-header text-white bg-primary">Employee</div>
-					<div id="jetForm" class="card-body"></div>
-				</div> -->
+				<div id="jetForm"></div>
 			</div>
 		</div>
 	</div>
@@ -32,7 +27,7 @@
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
 		crossorigin="anonymous"></script>
-	<script>
+<!-- 	<script>
 $(document).ready(function() {
     console.log( "ready!" );
     getJson("${className}");
@@ -43,7 +38,7 @@ function getJson(className){
 	$.ajax({
 		type : "GET",
 		url : "json/"+className,
-		//data : {'className':className},	
+
 		success : function(data) {
 			// Code to display the response.
 			console.log(data);
@@ -56,24 +51,15 @@ function getJson(className){
 	});
 }
 
-/* function createForm(){
-	   var form = $('<form/>', {action : 'sharer.php', method : 'POST'}).appendTo('body');
-	    form.append("<div class= 'appm'>Save this<div/>");
-	    form.append("<input type='text' placeholder='Name' name='routename' id='rname'/>");
-	    form.append("<input type='text' placeholder='description' id='rdescription' name='routedescription' class= 'address'/>");
-	    form.append("<input type='text' placeholder='tags' id='tags' name='routetags'  />");
-	    form.append("<br><input type='submit' id='savebutton' value = 'Save' />");
-} */
-
 function form(form){
 	console.log(form);
 	console.log(form.elements);
 	var elements = form.elements;
 	var action = getFormAction(form.actions);
-	//var card = createLayout();
+	
 	var card = $('<div/>',{class:'card'}).appendTo('#jetForm');
 	var cardHeader = $('<div/>',{class:'card-header text-white bg-primary'}).text(form.title).appendTo(card);
-	//cardHeader.appendTo(card);
+	
 	var cardBody = $('<div/>',{class:'card-body'}).appendTo(card);
 	var form = $('<form/>', {action : action.name, method : 'POST' ,id : form.id , name : form.name}).appendTo(cardBody);
 	  createFormFields(elements,form);
@@ -228,9 +214,6 @@ function selectInput(element){
             	val.appendTo(selectInput);
             });
 		}
-		//var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
-		  //  label.appendTo(inputWrapper);
-		//var numberInput = $('<input/>').attr({ type: 'number',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
 	return inputWrapper;
 }
 
@@ -238,8 +221,7 @@ function radioOrCheckInput(element,elementType){
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
 	var disabled = element.disabled ? 'disabled' : false;
-		//var inputWrapper = $('<div/>', {class : 'form-check form-check-inline'});
-		//options
+		
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
 		label.appendTo(inputWrapper);
@@ -292,6 +274,7 @@ function passwordInput(element){
 		var passwordInput = $('<input/>').attr({ type: 'password',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
 	return inputWrapper;
 }
-</script>
+</script> -->
+<script type="text/javascript" src="/js/script.js"></script>
 </body>
 </html>
