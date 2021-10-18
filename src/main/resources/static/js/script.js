@@ -6,10 +6,10 @@ $(document).ready(function() {
 const getClassName = function(){
     console.log('getting classname : ');
     var urlParams = new URLSearchParams(window.location.search);
-    console.log(urlParams.has('className')); // true 
+    console.log(urlParams.has('className')); 
     
     if(urlParams.has('className')){
-      console.log(urlParams.get('className')); // "edit"
+      console.log(urlParams.get('className'));
       const className = urlParams.get('className');
       getJson(className);
     }
