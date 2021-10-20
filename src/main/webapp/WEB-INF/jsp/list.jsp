@@ -6,8 +6,7 @@
 <c:url var="formLink" value="/dynamic/generate">
    <c:param name="className" value="${className}" /> 
 </c:url>
-<%-- <c:set var="contextPath" value="${pageContext.request.contextPath}" />
- --%>
+
  <!DOCTYPE html>
 <html >
 <head>
@@ -16,31 +15,20 @@
 </head>
 <body>
 
-
-<div class="row m-2">
-	<div class="col-md-10">
-		<h1 class="text-center" id="heading"></h1>
+<div class="container  bg-light px-0">
+	<div class="row my-3 py-2">
+		<div class="col-md-10">
+			<h2 id="heading"></h2>
+		</div>
+		<div class="col-md-2">
+			<a id="form-link" class="btn btn-primary d-block" href='${formLink}'></a>	
+		</div>
 	</div>
-	<div class="col-md-2">
-		<a id="form-link" class="ml-auto btn btn-primary d-inline-block" href='${formLink}'>Add Record</a>	
-	</div>
-</div>
-<div id="jet-table">
-
-</div>
-<!-- <table class="table table-striped table-hover" id="data-table">
-   <thead class="bg-primary text-white">
+	<div id="jet-table" class="card p-3">
 	
-  			<th></th>
-		
-  </thead> 
-  <tbody>
-    <tr>
- 		<td></td>
-    </tr> 
-  </tbody>
-</table> -->
-<!-- <script type="text/javascript" src="/js/list.js"></script> -->
+	</div>
+</div>
+
 <script>
 $(document).ready(function(){
 	// $('#data-table').DataTable();	
@@ -84,7 +72,7 @@ function getHeaderV2(){
 			 console.log(data.elements)
 			 console.log("listable elements");
 			// row.append("<tr>");
-			var thead = $('<thead/>').appendTo(table);
+			var thead = $('<thead/>',{class:'bg-primary text-white'}).appendTo(table);
 			var tr = $('<tr/>').appendTo(thead);
 			
 				$.each(data.elements,function(key,value){										
@@ -101,7 +89,7 @@ function getHeaderV2(){
 				
 			//	row.append("</tr>");
 				$('#heading').text(data.name);
-				
+				$('#form-link').text("+ Add "+data.name);
 				
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
@@ -239,17 +227,13 @@ function getList(className,header){
 								}
 							});
 					});
-					row.append("</tr>");
-				
+					row.append("</tr>");				
 				})
 			},
 			error: function(data){
 				console.log(data);
-			}
-			
+			}			
 		});
-		
-		
 	}
 
 </script>
