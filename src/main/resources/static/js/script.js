@@ -191,12 +191,13 @@ const selectInput = function(element){
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
 	var disabled = element.disabled ? 'disabled' : false;
+	var multiple = element.multiSelect ? 'multiple' : false;
 		//var inputWrapper = $('<div/>', {class : 'form-check form-check-inline'});
 		//options
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
 		label.appendTo(inputWrapper);
-   		var selectInput = $('<select/>').attr({class:'form-select' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
+   		var selectInput = $('<select/>').attr({class:'form-select' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled, multiple:multiple}).appendTo(inputWrapper);
    		var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);;
 		var options = [];
 		$.each(element.options, function (key, val) {
