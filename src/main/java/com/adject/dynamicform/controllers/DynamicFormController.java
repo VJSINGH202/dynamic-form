@@ -69,6 +69,12 @@ public class DynamicFormController {
 		return "list";
 	}
 	
+	@GetMapping("/list")
+	public String getList(@RequestParam String className, Model model) {
+		model.addAttribute("className", className);
+		return "list";
+	}
+	
 	@GetMapping(value="/load",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody String loadJson(@RequestParam("className") String className) {
 		

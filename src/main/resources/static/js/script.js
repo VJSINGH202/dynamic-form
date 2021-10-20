@@ -26,7 +26,7 @@ const getJson = function(className){
 			// Code to display the response.
 			console.log(data);
 			//createForm();
-			form(data);
+			form(data,className);
 		},
 		error : function(err){
             console.log(err);
@@ -34,19 +34,28 @@ const getJson = function(className){
 	});
 }
 
-const form = function(form){
+const form = function(form,className){
 	console.log(form);
 	console.log(form.elements);
 	var elements = form.elements;
 	var action = getFormAction(form.actions);
 	
 	var card = $('<div/>',{class:'card'}).appendTo('#jetForm');
-	var cardHeader = $('<div/>',{class:'card-header text-white bg-primary'}).text(form.title).appendTo(card);
-	
+	var cardHeader = $('<div/>',{class:'card-header text-white bg-primary'}).appendTo(card);
+	      createCardHeader(className,form.title).appendTo(cardHeader);
+	    //createCardHeader.appendTo(cardHeader);
 	var cardBody = $('<div/>',{class:'card-body'}).appendTo(card);
 	var form = $('<form/>', {action : action.name, method : 'POST' ,id : form.id , name : form.name}).appendTo(cardBody);
 	  createFormFields(elements,form);
 	  createSubmitButton(action,form)
+}
+
+const createCardHeader = function(className,title){
+   var row = $('<div/>',{class:'row'});  
+      $('<div/>',{class:'col-9'}).text(title).appendTo(row);
+     var col = $('<div/>',{class:'col-3'}).appendTo(row);
+      $('<a/>',{class : 'btn btn-outline-light btn-sm d-block',href : '/dynamic/list?className='+className}).text('<- Back').appendTo(col);
+   return row;
 }
 
 /*function createLayout(){
@@ -79,7 +88,10 @@ const getFormAction = function(actions){
 }
 
 const createSubmitButton = function(action,form){
-	var submitbutton = $('<input/>').attr({ type: action.type ,value: action.label ,class:'btn btn-primary'}).appendTo(form);
+                      $('<hr/>').appendTo(form);
+              var submitbuttonWrapper = $('<div>').attr({class : 'd-flex justify-content-end'}).appendTo(form);
+	var submitbutton = $('<input/>').attr({ type: action.type ,value: action.label ,class:'btn btn-primary'}).appendTo(submitbuttonWrapper);
+	var resetbutton = $('<input/>').attr({ type: 'reset' ,value: 'Reset' ,class:'btn btn-secondary'}).appendTo(submitbuttonWrapper);
 }
 
 const createFormFields = function(elements,form){
