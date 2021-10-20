@@ -35,6 +35,7 @@ $(document).ready(function(){
 	// $('#data-table').dataTable();
 
 	 getHeaderV2();
+	 $('[data-toggle="tooltip"]').tooltip()
 	 //$('#data-table').dataTable();
 /*	 $('#data-table').DataTable({
 	 	    pageLength: 10,
@@ -71,7 +72,6 @@ function getHeaderV2(){
 			 console.log("All elements:");
 			 console.log(data.elements)
 			 console.log("listable elements");
-			// row.append("<tr>");
 			var thead = $('<thead/>',{class:'bg-primary text-white'}).appendTo(table);
 			var tr = $('<tr/>').appendTo(thead);
 			
@@ -79,18 +79,18 @@ function getHeaderV2(){
 						 if(value.listable==true){
 						//	row.append("<th>"+value.label+"</th>");
 						$('<th/>').html(value.label).appendTo(tr);
-							 console.log(value.label);	
+							 console.log(value.label);
 							 header.push(value.name);
-						  }					 
+						  }
+						
 				});
-				
+				 $('<th/>').html("Action").appendTo(tr);
 				table.attr({id : 'data-table'});
 				getListV2(className,header,table);
 				
 			//	row.append("</tr>");
 				$('#heading').text(data.name);
 				$('#form-link').text("+ Add "+data.name);
-				
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			var json = JSON.parse(JSON.stringify(jqXHR));
@@ -104,7 +104,7 @@ function getHeaderV2(){
 
 }
 
-function getHeader(){
+/* function getHeader(){
 	var className="${className}";
 	console.log(className);
 	const  header=[];
@@ -128,10 +128,12 @@ function getHeader(){
 				$.each(data.elements,function(key,value){										
 						 if(value.listable==true){
 							row.append("<th>"+value.label+"</th>");
+							
 							 console.log(value.label);	
 							 header.push(value.name);
 						  }					 
 				});
+				
 			//	row.append("</tr>");
 				$('#heading').text(data.name);
 				
@@ -149,7 +151,7 @@ function getHeader(){
 	});
 	
 }
-
+ */
 	function getListV2(className,header,table){
 		console.log(""+className);		
 		var table = table;
@@ -181,8 +183,11 @@ function getHeader(){
 									console.log(k);
 									tr.append("<td>"+v+"</td>");
 								}
-							});
+							});							
 					});
+					tr.append("<td><a href='' class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='' class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a></td>")
+/* 					tr.append("<a href='' class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Tooltip on top'><i class='fal fa-trash'></i></a></td>") */
+					
 					tr.appendTo(tbody);
 					
 				
@@ -199,7 +204,7 @@ function getHeader(){
 		
 	}
 	
-function getList(className,header){
+/* function getList(className,header){
 		console.log(className);		
 		
 		$.ajax({
@@ -227,6 +232,7 @@ function getList(className,header){
 								}
 							});
 					});
+					
 					row.append("</tr>");				
 				})
 			},
@@ -234,7 +240,7 @@ function getList(className,header){
 				console.log(data);
 			}			
 		});
-	}
+	} */
 
 </script>
 </body>
