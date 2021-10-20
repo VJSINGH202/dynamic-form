@@ -87,12 +87,19 @@ public class DynamicFormController {
 		return formJson;
 	}
 
-	@GetMapping(value="/list",produces= MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value="/entityList",produces= MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody String getList(@RequestParam("className") String className) {
 		System.out.println("inside list"+className);
 		Gson gson=new Gson();
 		String json = gson.toJson(jetFormService.getList(className));
 		System.out.println("Json:"+json);
 		return json;
+	}
+	
+	@GetMapping(value="/entity",produces=MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody String getEntity(@RequestParam("id")String id,@RequestParam("className") String className) {
+		
+		System.out.println("id: "+id+"className: "+className);
+		return null;
 	}
 }

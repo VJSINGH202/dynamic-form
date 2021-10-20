@@ -104,71 +104,25 @@ function getHeaderV2(){
 
 }
 
-/* function getHeader(){
-	var className="${className}";
-	console.log(className);
-	const  header=[];
-	var table = createTable();
-	$.ajax({
-		url: 'load',
-		type:'GET',
-		data:{
-			className:"${className}"
-		},
-		success:function(data){
-			console.log("json response: ")
-			console.log(data);
-		
-			 var row=$("#data-table > thead > tr");
-			 row.empty();
-			 console.log("All elements:");
-			 console.log(data.elements)
-			 console.log("listable elements");
-			// row.append("<tr>");
-				$.each(data.elements,function(key,value){										
-						 if(value.listable==true){
-							row.append("<th>"+value.label+"</th>");
-							
-							 console.log(value.label);	
-							 header.push(value.name);
-						  }					 
-				});
-				
-			//	row.append("</tr>");
-				$('#heading').text(data.name);
-				
-				getList(className,header);
-				
-		},
-		error : function(jqXHR, textStatus, errorThrown) {
-			var json = JSON.parse(JSON.stringify(jqXHR));
 
-			console.log(json);
-			console.log("response textStatus " + textStatus);
-			console.log("response jqXHR " + jqXHR);
-			console.log("response errorThrown " + errorThrown);
-		}
-	});
-	
-}
- */
 	function getListV2(className,header,table){
-		console.log(""+className);		
+		console.log("name:"+className);	
+		
 		var table = table;
 		console.log(table);
 		$.ajax({
-			url: 'list',
+			url: 'entityList',
 			type: 'GET',
 			data:{
 				className:className
 			},
 			success:function(data){
+				console.log("data of json")
 				console.log(data);
+				console.log("headers")
 				console.log(header);
 				console.log("fields")
-				/* var row=$("#data-table > tbody");
-				row.empty(); */
-				
+
 			var tbody = $('<tbody/>').appendTo(table);
 				
 				$.each(data,function(key,value){
@@ -185,11 +139,8 @@ function getHeaderV2(){
 								}
 							});							
 					});
-					tr.append("<td><a href='' class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='' class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a></td>")
-/* 					tr.append("<a href='' class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Tooltip on top'><i class='fal fa-trash'></i></a></td>") */
-					
+					tr.append("<td><button class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></button> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");				
 					tr.appendTo(tbody);
-					
 				
 				});
 				
@@ -200,9 +151,26 @@ function getHeaderV2(){
 			}
 			
 		});
-		
-		
 	}
+ function update (id,className){
+	 console.log("inside update method: "+id);
+	 console.log("className:"+className);
+	 
+ 	 $.ajax({
+		 url:'entity',
+		 type:'GET',
+		 data:{
+			 id:id,
+			 className:className
+		 },
+		 success:function(data){
+			console.log(data); 
+		 },
+	 	error:function(data){
+	 		console.log(data); 
+	 	}
+	 }) 
+ }
 	
 /* function getList(className,header){
 		console.log(className);		
@@ -240,8 +208,56 @@ function getHeaderV2(){
 				console.log(data);
 			}			
 		});
-	} */
+	}
+*/
+/* function getHeader(){
+var className="${className}";
+console.log(className);
+const  header=[];
+var table = createTable();
+$.ajax({
+	url: 'load',
+	type:'GET',
+	data:{
+		className:"${className}"
+	},
+	success:function(data){
+		console.log("json response: ")
+		console.log(data);
+	
+		 var row=$("#data-table > thead > tr");
+		 row.empty();
+		 console.log("All elements:");
+		 console.log(data.elements)
+		 console.log("listable elements");
+		// row.append("<tr>");
+			$.each(data.elements,function(key,value){										
+					 if(value.listable==true){
+						row.append("<th>"+value.label+"</th>");
+						
+						 console.log(value.label);	
+						 header.push(value.name);
+					  }					 
+			});
+			
+		//	row.append("</tr>");
+			$('#heading').text(data.name);
+			
+			getList(className,header);
+			
+	},
+	error : function(jqXHR, textStatus, errorThrown) {
+		var json = JSON.parse(JSON.stringify(jqXHR));
 
+		console.log(json);
+		console.log("response textStatus " + textStatus);
+		console.log("response jqXHR " + jqXHR);
+		console.log("response errorThrown " + errorThrown);
+	}
+});
+
+}
+*/
 </script>
 </body>
 </html>
