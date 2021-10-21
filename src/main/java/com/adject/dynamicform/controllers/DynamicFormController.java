@@ -1,5 +1,7 @@
 package com.adject.dynamicform.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.adject.dynamicform.modal.DynamicForm;
 import com.google.gson.Gson;
 
+import io.jetform.core.annotation.model.FormElementWrapper;
 import io.jetform.core.annotation.model.JetFormWrapper;
 import io.jetform.core.engine.helper.FormRenderer;
+import io.jetform.core.entity.Employee;
 import io.jetform.core.service.JetFormService;
 
 @Controller
@@ -100,10 +104,20 @@ public class DynamicFormController {
 	}
 
 	@GetMapping(value = "/entity", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody String getEntity(@RequestParam("id") String id, @RequestParam("className") String className) {
+	public @ResponseBody String getEntity(@RequestParam("id") String id, @RequestParam("className") String className) throws ClassNotFoundException {
 
-		System.out.println("id: " + id + "className: " + className);
-		jetFormService.getEntity(Long.valueOf(id), className);
+		System.out.println("id: " + id + "  className: " + className);
+		JetFormWrapper formWrapper = jetFormService.getFormWrapper(className);
+		List<FormElementWrapper> elements = formWrapper.getElements();
+		elements.stream()
+			.forEach(a->System.out.println(a.getName()));
+		System.out.println();
+		Object entity = jetFormService.getEntity(Long.valueOf(id), className);
+		System.out.println(entity.toString());		
+		Object cast = Class.forName(className).cast(entity);
+		System.out.println(cast.toString());
+//		Employee cast = Employee.class.cast(entity);
+
 		return null;
 	}
 
