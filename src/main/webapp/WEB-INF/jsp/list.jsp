@@ -21,7 +21,7 @@
 			<h2 id="heading"></h2>
 		</div>
 		<div class="col-md-2">
-			<a id="form-link" class="btn btn-primary d-block" href='${formLink}'></a>	
+			<a id="form-link" class="btn btn-primary d-block" href='${formLink}'></a>
 		</div>
 	</div>
 	<div id="jet-table" class="card p-3">
@@ -36,8 +36,8 @@ $(document).ready(function(){
 
 	 getHeaderV2();
 	 $('[data-toggle="tooltip"]').tooltip()
-	 //$('#data-table').dataTable();
-/*	 $('#data-table').DataTable({
+/*	 $('#data-table').dataTable();
+	 $('#data-table').DataTable({
 	 	    pageLength: 10,
 		    filter: true,
 		    deferRender: true,
@@ -77,7 +77,6 @@ function getHeaderV2(){
 			
 				$.each(data.elements,function(key,value){										
 						 if(value.listable==true){
-						//	row.append("<th>"+value.label+"</th>");
 						$('<th/>').html(value.label).appendTo(tr);
 							 console.log(value.label);
 							 header.push(value.name);
@@ -131,7 +130,7 @@ function getHeaderV2(){
 					//row.append("<tr>");
 					var tr = $('<tr/>');
 					$.each(value,function(k,v){
-							//console.log("each attribute of row: "+ k)
+//					console.log("each attribute of row: "+ k)
 							$.each(header,function(ky,val){
 								if(val == k){
 									console.log(k);

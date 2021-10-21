@@ -103,6 +103,7 @@ public class DynamicFormController {
 	public @ResponseBody String getEntity(@RequestParam("id") String id, @RequestParam("className") String className) {
 
 		System.out.println("id: " + id + "className: " + className);
+		jetFormService.getEntity(Long.valueOf(id), className);
 		return null;
 	}
 
