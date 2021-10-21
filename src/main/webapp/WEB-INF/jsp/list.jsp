@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ include file="init.jsp" %>
  <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+ <c:set var="contextPath" value="${pageContext.request.contextPath}" />
  
 <c:url var="formLink" value="/dynamic/generate">
    <c:param name="className" value="${className}" /> 
@@ -138,7 +139,8 @@ function getHeaderV2(){
 								}
 							});							
 					});
-					tr.append("<td><button class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></button> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");				
+//					tr.append("<td><a class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
+					tr.append("<td><a class='btn btn-md text-success' href='${contextPath}/dynamic/generate?id="+value.id+"&className="+className+"' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
 					tr.appendTo(tbody);
 				
 				});

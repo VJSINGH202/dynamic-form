@@ -62,12 +62,26 @@ public class DynamicFormController {
 	public String getForm(@PathVariable String className) {
 		System.out.println("Printing the className : " + className);
 		String formJson = jetFormService.getFormJson(className);
+		System.out.println("form json in new record method"+formJson);
 		return formJson;
 	}
-
+	
+	@GetMapping( value="/getJson",produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JetFormWrapper getJsonWithFormValues(@RequestParam("id") String id, @RequestParam("className") String className) {
+		System.out.println("id and class name in update method: ");
+		System.out.println(id+className);
+		JetFormWrapper formWrapper = jetFormService.getFormWrapperWithValues(Long.valueOf(id), className);
+//		System.out.println("Form Wrapper"+formWrapper);
+//		Gson gson=new Gson();
+//				
+		return formWrapper;
+	}
+	
 	@GetMapping("/generate")
 	public String getForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
-		// model.addAttribute("className", dynamicForm.getClassName());
+		System.out.println("classname received to update form"+dynamicForm.getClassName());
+		System.out.println("id of the entity:"+dynamicForm.getId());
+		
 		return "form";
 	}
 
@@ -127,5 +141,6 @@ public class DynamicFormController {
 		System.out.println(jetFormService.saveEntity(formData));
 		return null;
 	}
+	
 
 }

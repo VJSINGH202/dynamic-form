@@ -7,16 +7,48 @@ const getClassName = function(){
     console.log('getting classname : ');
     //it searches the parameter in query string 
     var urlParams = new URLSearchParams(window.location.search);
-    console.log(urlParams.has('className')); 
-    
+    console.log("className from url param : ")
+    console.log(urlParams.has('className'));
+    console.log(urlParams);
+    var id=urlParams.get('id');
     if(urlParams.has('className')){
       console.log(urlParams.get('className'));
+      console.log("id: ")
+      console.log(urlParams.get('id'));
       const className = urlParams.get('className');
-      getJson(className);
+      if(id!=null){
+      	alert(id);
+      	getUpdateForm(id,className);
+      }
+      else{
+          getNewForm(className);
+      }
     }
+
 }
 
-const getJson = function(className){
+const getUpdateForm=function(id,className){
+	console.log(id+className);
+	$.ajax({
+		type:"GET",
+		url:"getJson",
+		data:{
+			id:id,
+			className:className
+		},
+		success:function(data){
+			console.log("json with field value")
+			console.log(data);
+			form(data,className);
+		},
+		error:function(data){
+			console.log(data)
+		}
+		
+	});
+}
+
+const getNewForm = function(className){
 	console.log(className);
 	$.ajax({
 		type : "GET",
@@ -24,6 +56,7 @@ const getJson = function(className){
 
 		success : function(data) {
 			// Code to display the response.
+			console.log("formData received");
 			console.log(data);
 			//createForm();
 			form(data,className);
