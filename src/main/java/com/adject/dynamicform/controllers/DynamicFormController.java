@@ -124,6 +124,7 @@ public class DynamicFormController {
 	public String saveEntity(@RequestBody MultiValueMap<String, String> formData) {
 // your code goes here
 		System.out.println("formData : " + formData);
+		System.out.println(jetFormService.saveEntity(formData));
 		return null;
 	}
 
