@@ -79,6 +79,8 @@ const form = function(form,className){
 	    //createCardHeader.appendTo(cardHeader);
 	var cardBody = $('<div/>',{class:'card-body'}).appendTo(card);
 	var form = $('<form/>', {action : action.name, method : 'POST' ,id : form.id , name : form.name}).appendTo(cardBody);
+	  $('<input/>',{type:'hidden',name : 'className',value : className}).appendTo(form);
+	  
 	  createFormFields(elements,form);
 	  createSubmitButton(action,form)
 }
@@ -167,6 +169,12 @@ const checkInputType = function(element){
 		result = emailInput(element);
 		console.log(result);
 		    break;
+      case 'hidden':
+		    // code block
+		console.log("email");
+		result = hiddenInput(element);
+		console.log(result);
+		    break;
 	  case 'password':
 		    // code block
 		console.log("password");
@@ -218,6 +226,18 @@ const textInput = function(element){
 		            label.appendTo(inputWrapper);
 		var textInput = $('<input/>').attr({ type: 'text',class:'form-control' ,id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
 	return inputWrapper;
+}
+
+const hiddenInput = function(element){
+	var element = element
+	var readOnly = element.readOnly ? 'readonly' : false;
+	var disabled = element.disabled ? 'disabled' : false;
+	var hiddenId = element.value === '' ? 0 : element.value ;
+	console.log('Printing the hidden value : '+ element.value);
+	console.log('Printing the Hidden Id : '+hiddenId);
+	console.log('Printing the Condition : '+ (element.id === ''));
+	var textInput = $('<input/>').attr({ type: 'hidden',id: element.id, name: element.name, placeholder : element.placeHolder ,value: hiddenId ,readonly : readOnly,disabled : disabled});
+	return textInput;
 }
 
 const selectInput = function(element){

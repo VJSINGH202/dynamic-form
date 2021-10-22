@@ -135,11 +135,15 @@ public class DynamicFormController {
 	 */
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String saveEntity(@RequestBody MultiValueMap<String, String> formData) {
+	public String saveEntity(@RequestBody MultiValueMap<String, Object> formData,Model model) {
 // your code goes here
+		String className = formData.get("className").get(0).toString();
+		Object saveEntity = jetFormService.saveEntity(formData);
 		System.out.println("formData : " + formData);
-		System.out.println(jetFormService.saveEntity(formData));
-		return null;
+		System.out.println(saveEntity);
+		model.addAttribute("className", className);
+		return "list";
+		//return "index";
 	}
 	
 
