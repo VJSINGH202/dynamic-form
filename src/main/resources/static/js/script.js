@@ -252,11 +252,20 @@ const selectInput = function(element){
 		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
 		label.appendTo(inputWrapper);
    		var selectInput = $('<select/>').attr({class:'form-select' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled, multiple:multiple}).appendTo(inputWrapper);
-   		var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);;
+   		//var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);
+   		if(element.value !== ''){
+            var seletedOption = $('<option/>').text(element.placeHolder).appendTo(selectInput);
+            }else{
+            var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);
+            }
 		var options = [];
 		$.each(element.options, function (key, val) {
             const [value, labelText] = val.split(':');
-       		var option = $('<option/>', {value : value}).text(labelText);
+            if(value === element.value){
+               var option = $('<option/>', {value : value ,selected : 'selected'}).text(labelText);
+            }else{
+               var option = $('<option/>', {value : value}).text(labelText);
+            }
        		options.push(option);
     		});
 		if(Array.isArray(options)){
@@ -281,7 +290,11 @@ const radioOrCheckInput = function(element,elementType){
             const [value, labelText] = val.split(':');
             var radioLabel = $('<label/>', {for : element.id ,class : 'form-check-label'}).text(labelText);
             radioLabel.appendTo(radioWrapper);
-       		var numberInput = $('<input/>').attr({ type: elementType,class:'form-check-input' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled}).appendTo(radioWrapper);
+            if(value === element.value){
+               $('<input/>').attr({ type: elementType,class:'form-check-input' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled ,checked : 'checked'}).appendTo(radioWrapper);
+            }else{
+       		   $('<input/>').attr({ type: elementType,class:'form-check-input' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled}).appendTo(radioWrapper);
+       		}
        		wrapper.push(radioWrapper);
     		});
 		if(Array.isArray(wrapper)){
