@@ -140,7 +140,7 @@ function getHeaderV2(){
 							});							
 					});
 //					tr.append("<td><a class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
-					tr.append("<td><a class='btn btn-md text-success' href='${contextPath}/dynamic/generate?id="+value.id+"&className="+className+"' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
+					tr.append("<td><a class='btn btn-md text-success' href='${contextPath}/dynamic/generate?id="+value.id+"&className="+className+"' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='#' onclick=deleteEntity('"+value.id+"','"+className+"',event) class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a></td>");
 					tr.appendTo(tbody);
 				
 				});
@@ -173,6 +173,28 @@ function getHeaderV2(){
 	 }) 
  }
 	
+ function deleteEntity(id,className,event){
+	 console.log(id);
+	 console.log(className);
+	 var table=$('#data-table').DataTable();
+     console.log(event.target);
+	 var tableRow = $(event.target).parent().parent().parent();
+	 $.ajax({
+		 url:'delete',
+		 type:'GET',
+		 data:{
+			 id:id,
+			 className:className
+		 },
+		 success:function(data){
+			console.log(data); 
+			table.row(tableRow).remove().draw();
+		 },
+	 	error:function(data){
+	 		console.log(data); 
+	 	}
+	 })
+ }
 /* function getList(className,header){
 		console.log(className);		
 		

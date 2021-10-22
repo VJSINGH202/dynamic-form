@@ -146,5 +146,12 @@ public class DynamicFormController {
 		//return "index";
 	}
 	
+	@GetMapping(value="/delete")
+	public @ResponseBody String deleteEntity(@RequestParam("id") String id,@RequestParam("className") String className ) {
+		
+		boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
+		return status?"Deletd":"Something went wrong";
+	}
+	
 
 }

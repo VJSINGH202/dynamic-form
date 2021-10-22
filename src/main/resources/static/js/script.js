@@ -17,7 +17,7 @@ const getClassName = function(){
       console.log(urlParams.get('id'));
       const className = urlParams.get('className');
       if(id!=null){
-      	alert(id);
+      
       	getUpdateForm(id,className);
       }
       else{
@@ -50,6 +50,7 @@ const getUpdateForm=function(id,className){
 
 const getNewForm = function(className){
 	console.log(className);
+	
 	$.ajax({
 		type : "GET",
 		url : "json/"+className,
