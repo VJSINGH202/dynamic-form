@@ -83,17 +83,52 @@ const form = function(form,className){
 	  $('<input/>',{type:'hidden',name : 'className',value : className}).appendTo(form);
 	  
 	  createFormFields(elements,form);
-	  createSubmitButton(action,form)
+	  createSubmitButton(action,form);
+	  onFormSubmit(action,form,className);
 }
 
 const createCardHeader = function(className,title){
-   var row = $('<div/>',{class:'row'});  
+     var row = $('<div/>',{class:'row'});  
       $('<div/>',{class:'col-9'}).text(title).appendTo(row);
      var col = $('<div/>',{class:'col-3'}).appendTo(row);
       $('<a/>',{class : 'btn btn-outline-light btn-sm d-block',href : '/dynamic/list?className='+className}).text('<- Back').appendTo(col);
    return row;
 }
 
+const onFormSubmit = function(action,form,className){
+       console.log('Form Submiting : ');
+       console.log(form);
+       $(form).submit(function(e){
+          e.preventDefault();
+          console.log('Form submited : ');
+          var form = $(this);
+          console.log(form);
+          var data = $(this).serialize();
+          console.log(data);
+          var data = JSON.stringify( $(form).serializeArray() );
+          console.log(data);
+          //contentType : 'application/json; charset=UTF-8',
+          $.ajax({
+				type:"POST",
+				url: action.name,
+				data:{
+					'formData' : JSON.stringify(getFormDataJson(form)),
+					'className' : className
+				},
+				success:function(data){
+					console.log("response after submit")
+					console.log(data);
+					if(data == 'list')
+					window.location.href = '/dynamic/list?className='+className;
+					//form(data,className);
+				},
+				error:function(data){
+					console.log(data)
+				}
+		
+	      });
+       });
+}
 /*function createLayout(){
 	var card = $('<div/>',{class:'card'});
 	$('<div/>',{class:'card-header text-white bg-primary'}).appentTo(card);
@@ -109,6 +144,19 @@ function createFormHeader(){
 	return card;
 	
 }*/
+
+const getFormDataJson = function ($form){
+    var unindexed_array = $form.serializeArray();
+    var indexed_array = {};
+
+    $.map(unindexed_array, function(n, i){
+       if(n['name'] !== 'className'){
+         indexed_array[n['name']] = n['value'];
+       } 
+    });
+
+    return indexed_array;
+}
 
 const getFormAction = function(actions){
 	//var actions = actions;

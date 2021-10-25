@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.adject.dynamicform.modal.DynamicForm;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import io.jetform.core.annotation.model.FormElementWrapper;
@@ -134,9 +136,10 @@ public class DynamicFormController {
 	 * { System.out.println("inside : "); System.out.println(data); return null; }
 	 */
 
+	/*
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public String saveEntity(@RequestBody MultiValueMap<String, Object> formData,Model model) {
-// your code goes here
+ 
 		String className = formData.get("className").get(0).toString();
 		Object saveEntity = jetFormService.saveEntity(formData);
 		System.out.println("formData : " + formData);
@@ -145,12 +148,44 @@ public class DynamicFormController {
 		return "list";
 		//return "index";
 	}
+	*/
+	//, consumes = MediaType.APPLICATION_JSON_VALUE
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	@ResponseBody
+	public String saveEntity(@RequestParam String formData, @RequestParam String className) {
+ 
+		System.out.println(formData.toString());
+		Object saveEntity;
+		Class<?> clazz;
+		try {
+			clazz = Class.forName(className);
+			Object readValue = new ObjectMapper().readValue(formData, clazz);  
+			saveEntity = jetFormService.saveEntity(readValue);
+			System.out.println("Saved entity : "+ saveEntity);
+		} catch (ClassNotFoundException | JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
+		 * JSONArray array = new JSONArray(formData); JSONObject object =
+		 * array.getJSONObject(formData);
+		 */
+		/*
+		 * String className = formData.get("className").get(0).toString(); Object
+		 * saveEntity = jetFormService.saveEntity(formData);
+		 * System.out.println("formData : " + formData); System.out.println(saveEntity);
+		 * model.addAttribute("className", className);
+		 */
+		return "list";
+		//return "index";
+	}
 	
 	@GetMapping(value="/delete")
 	public @ResponseBody String deleteEntity(@RequestParam("id") String id,@RequestParam("className") String className ) {
 		
 		boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
-		return status?"Deletd":"Something went wrong";
+		return status ? "Deletd" : "Something went wrong";
 	}
 	
 
