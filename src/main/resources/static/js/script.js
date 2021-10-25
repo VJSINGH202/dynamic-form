@@ -84,7 +84,7 @@ const form = function(form,className){
 	  
 	  createFormFields(elements,form);
 	  createSubmitButton(action,form);
-	  onFormSubmit(action,form,className);
+	//  onFormSubmit(action,form,className);
 }
 
 const createCardHeader = function(className,title){

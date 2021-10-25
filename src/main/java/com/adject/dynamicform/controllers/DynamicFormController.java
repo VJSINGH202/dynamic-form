@@ -136,7 +136,7 @@ public class DynamicFormController {
 	 * { System.out.println("inside : "); System.out.println(data); return null; }
 	 */
 
-	/*
+	
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public String saveEntity(@RequestBody MultiValueMap<String, Object> formData,Model model) {
  
@@ -148,9 +148,9 @@ public class DynamicFormController {
 		return "list";
 		//return "index";
 	}
-	*/
+	
 	//, consumes = MediaType.APPLICATION_JSON_VALUE
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	/*@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@ResponseBody
 	public String saveEntity(@RequestParam String formData, @RequestParam String className) {
  
@@ -177,9 +177,9 @@ public class DynamicFormController {
 		 * System.out.println("formData : " + formData); System.out.println(saveEntity);
 		 * model.addAttribute("className", className);
 		 */
-		return "list";
+		//return "list";
 		//return "index";
-	}
+	//}*/
 	
 	@GetMapping(value="/delete")
 	public @ResponseBody String deleteEntity(@RequestParam("id") String id,@RequestParam("className") String className ) {
