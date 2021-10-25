@@ -75,14 +75,21 @@ function getHeaderV2(){
 			 console.log("listable elements");
 			var thead = $('<thead/>',{class:'bg-primary text-white'}).appendTo(table);
 			var tr = $('<tr/>').appendTo(thead);
-			
+			var option=isSelectable(data);
+			console.log("selected option: ")
+			console.log(option);
+			  var th=$('<th/>').appendTo(tr);
+			if(option==='selectable'){
+				  
+					$('<input/>').attr({type:'checkbox',value:'all'}).appendTo(th);
+				header.push(th);
+			}
 				$.each(data.elements,function(key,value){										
 						 if(value.listable==true){
-						$('<th/>').html(value.label).appendTo(tr);
-							 console.log(value.label);
-							 header.push(value.name);
-						  }
-						
+								 $('<th/>').html(value.label).appendTo(tr);
+								 console.log(value.label);
+								 header.push(value.name);
+						 }
 				});
 				 $('<th/>').html("Action").appendTo(tr);
 				table.attr({id : 'data-table'});
@@ -104,6 +111,15 @@ function getHeaderV2(){
 
 }
 
+function isSelectable(data){
+	if(data.selectable!=data.listIndex){
+		if(data.selectable==true && data.listIndex==false)
+			return "selectable";
+		if(data.selectable==false && data.listIndex==true)
+			return "listIndex";
+	}
+
+}
 
 	function getListV2(className,header,table){
 		console.log("name:"+className);	
@@ -130,14 +146,24 @@ function getHeaderV2(){
 					console.log(value);
 					//row.append("<tr>");
 					var tr = $('<tr/>');
+					var option=isSelectable(data);
+					if(option=='listIndex'){
+						var td=$('<td/>').text(key).appendTo(tr);
+					}
+					else{
+						var td=$('<td>'+'</td>').appendTo(tr);
+					}
+
 					$.each(value,function(k,v){
 //					console.log("each attribute of row: "+ k)
 							$.each(header,function(ky,val){
 								if(val == k){
 									console.log(k);
+									
 									tr.append("<td>"+v+"</td>");
 								}
-							});							
+							});	
+							
 					});
 //					tr.append("<td><a class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
 					tr.append("<td><a class='btn btn-md text-success' href='${contextPath}/dynamic/generate?id="+value.id+"&className="+className+"' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='#' onclick=deleteEntity('"+value.id+"','"+className+"',event) class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a></td>");
