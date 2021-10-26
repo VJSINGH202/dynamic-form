@@ -182,11 +182,27 @@ public class DynamicFormController {
 	//}*/
 	
 	@GetMapping(value="/delete")
-	public @ResponseBody String deleteEntity(@RequestParam("id") String id,@RequestParam("className") String className ) {
+	public @ResponseBody String deleteEntity(@RequestParam("id") Long id,@RequestParam("className") String className ) {
 		
 		boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
-		return status ? "Deletd" : "Something went wrong";
+		return status ? "Deleted" : "Something went wrong";
 	}
-	
+	@RequestMapping(value="/deletemultiple")
+	public @ResponseBody String deleteMultiple(@RequestParam("deleteId[]") Long []deletedIdArray,@RequestParam("className")String className) {
+		
+		for(Long id:deletedIdArray)
+			
+		System.out.println(id);
+		System.out.println(className);
+		try {
+			jetFormService.deleteMultiple(deletedIdArray, className);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "something went wrong";
+		}
+		System.out.println("after delte method call");
+		return "deleted";
+	}
 
 }

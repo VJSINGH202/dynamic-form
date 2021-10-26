@@ -12,5 +12,5 @@ public class DynamicFormApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DynamicFormApplication.class, args);
-	}	 
+	}
 }
