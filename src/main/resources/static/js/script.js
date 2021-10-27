@@ -79,13 +79,225 @@ const form = function(form,className){
 	      createCardHeader(className,form.title).appendTo(cardHeader);
 	    //createCardHeader.appendTo(cardHeader);
 	var cardBody = $('<div/>',{class:'card-body'}).appendTo(card);
+	//action : action.name,
 	var form = $('<form/>', {action : action.name, method : 'POST' ,id : form.id , name : form.name}).appendTo(cardBody);
 	  $('<input/>',{type:'hidden',name : 'className',value : className}).appendTo(form);
 	  
 	  createFormFields(elements,form);
 	  createSubmitButton(action,form);
+	  formValidation(elements,form);
 	//  onFormSubmit(action,form,className);
 }
+
+const formValidation = function(elements,form){
+      console.log("printing validation data : "+ JSON.stringify(elements));
+     // $.each(elements,function(key,value){
+         // var indexed_array = {};
+     // });
+      var validationsMap = {};
+      $.map(elements, function(n, i){
+		  validationsMap[n['name']] = n['validations'];
+	  });
+	  console.log("Printing the validation Map : " + JSON.stringify(validationsMap));
+      var rules = createValidationRules(validationsMap);
+      var messages = createValidationMessages(validationsMap);
+     // $("#commentForm").validate();
+      $(form).validate({
+           rules: rules,
+		  messages: messages,
+		  errorClass: "is-invalid",
+		  onsubmit: true,
+		  validClass: "is-valid",
+          errorElement: "div",
+          highlight: function(element, errorClass, validClass) {
+          console.log(element);
+          console.log($(element));
+          console.log($(element.nextSibling));
+          var element = $(element);
+          console.log("printing the sib"+ JSON.stringify(element.nextSibling));
+          console.log($(element.form));
+           console.log($(element).siblings("div"))
+          console.log($(element).next());
+          console.log($(element).next().next());
+          console.log(errorClass);
+          console.log(validClass);
+          //$(element.nextSibling).addClass().removeClass();
+          console.log("highlight");
+						    $(element).addClass(errorClass).removeClass(validClass);
+						    $(element.nextSibling).removeClass("valid-feedback").addClass("invalid-feedback");
+						    //$(element.form).find("label[for=" + element.id + "]").addClass(errorClass);
+						    console.log($(element.nextSibling));
+				    },
+         unhighlight: function(element, errorClass, validClass) {
+         /*console.log(element);
+          console.log(errorClass);
+          console.log(validClass);*/
+          console.log("unhighlight");
+          $(element).removeClass(errorClass).addClass(validClass);    
+                           /* $(element).removeClass(errorClass).addClass(validClass);    
+						    $(element.nextSibling).removeClass("invalid-feedback").addClass("valid-feedback").text("Look Ok.");
+						    $(element.form).find("label[for=" + element.id + "]").removeClass(errorClass);*/
+                    },
+          errorPlacement: function(error, element) {
+                           console.log("printing the errorPlacement : ");
+                           console.log($(element).parent());
+                           error.appendTo( $(element).parent());
+          }
+         });
+         console.log({
+           rules: rules,
+		  messages: messages
+		  
+         });
+         /* $(form).submit(function(e){
+          e.preventDefault();
+          });
+          
+          ,
+		  submitHandler: function(form) {
+            form.submit();
+            
+            }
+          form.submit();*/
+          $(form).submit(function(event) {
+            if (form.valid()){
+            console.log($(this).serialize());
+		       /*
+		        $.ajax({
+		            type: form.attr("method"), // use method specified in form attributes
+		            url: form.attr("action"), // use action specified in form attributes
+		            data: form.serialize(), // encodes set of form elements as string for submission
+		            success: function(data) {
+		                // get response from servlet and display on page via jQuery 
+		            }
+		        });
+		       */
+		       $.ajax({
+				type: form.attr("method"),
+				url: form.attr("action"),
+				data: form.serialize(),
+				success:function(data){
+					console.log("response after submit")
+					console.log(data);
+					if(data == 'list')
+					var className = $("[name='className']").val();
+					console.log("Printing the className : "+className);
+					window.location.href = '/dynamic/list?className='+className;
+					//form(data,className);
+				},
+				error:function(data){
+					console.log(data)
+				}
+		
+	      });
+            }
+            event.preventDefault(); // stop form from redirecting to java servlet page
+         });
+};
+
+const createValidationRules = function(validationsMap){
+    //elements[1].validations
+    console.log("Creating the validations : "+ JSON.stringify(validationsMap));
+    validationRulesType = {};
+     $.each(validationsMap, function(key,value){
+        
+        if(value != 0){
+          console.log("validations : "+JSON.stringify(value));
+          console.log("key : "+JSON.stringify(key));
+          console.log("validationsMap[key] : "+ JSON.stringify(validationsMap[key]));
+          validationRulesType[key] = createValidationObject(value);
+        }
+          
+     }); 
+     //validationsMap[key]
+     console.log("validationRulesType : "+JSON.stringify(validationRulesType));
+     return validationRulesType;
+};
+
+const createValidationObject = function(validationArray){
+    var validationObject = {};
+      $.map(validationArray, function(n, i){
+         if((n['type']).toLowerCase()=== 'required'){
+            validationObject[(n['type']).toLowerCase()] = getBool(n['value']);
+         }else{
+            validationObject[(n['type']).toLowerCase()] = n['value'];
+         } 
+	  });
+      console.log("printing the validation object : "+ JSON.stringify(validationObject));
+      return validationObject;
+};
+
+const getBool = function(val){ 
+    var num = +val;
+    return !isNaN(num) ? !!num : !!String(val).toLowerCase().replace(!!0,'');
+}
+
+const createValidationMessages = function(validationsMap){
+    console.log("Creating the messags for validations : "+ JSON.stringify(validationsMap));
+    validationMessage = {};
+     $.each(validationsMap, function(key,value){
+        
+        if(value != 0){
+          console.log("validations : "+JSON.stringify(value));
+          console.log("key : "+JSON.stringify(key));
+          console.log("validationsMap[key] : "+ JSON.stringify(validationsMap[key]));
+          validationMessage[key] = createMessageObject(key,value);
+        }
+          
+     }); 
+     //validationsMap[key]
+     console.log("validationMessage : "+JSON.stringify(validationMessage));
+     return validationMessage;
+};
+
+// var validationsMap = {};
+ //     $.map(elements, function(n, i){
+//		  validationsMap[n['name']] = n['validations'];
+// });
+
+const createMessageObject = function(fieldName,validationArray){
+    var messageObject = {};
+    var fieldName =fieldName;
+    console.log("printing the validation array in createMessageObject : "+ JSON.stringify(validationArray));
+      $.map(validationArray, function(n, i){
+      console.log("printing the n : "+JSON.stringify(n));
+     // if(validationArray.length !== 0){}
+	      messageObject[(n['type']).toLowerCase()] = ckeckMessageType(n,fieldName);
+	  });
+      console.log("printing the validation object : "+ JSON.stringify(messageObject));
+      return messageObject;
+};
+
+const ckeckMessageType = function(validation,fieldName){
+console.log("printing the ckeckMessageType : "+JSON.stringify(validation));
+console.log("printing the validation.type : "+JSON.stringify(validation.type));
+console.log(validation.type.toLowerCase());
+  var errorMessage = "";
+    switch(validation.type.toLowerCase()) {
+	  case 'required':
+	   errorMessage = fieldName + " is Required.";
+	    break;
+	  case 'min':
+		errorMessage = fieldName + " is required min("+validation.value+") size";
+	    break;
+		    break;
+      case 'max':
+		errorMessage = fieldName + " is required max("+validation.value+") size";
+		    break;
+	  case 'minlength':
+	  console.log('inside minlenght : ');
+		 errorMessage = fieldName + " is required minlenght("+validation.value+")."; 
+		    break;
+	  case 'maxlenght':
+	   errorMessage = fieldName + " is required maxlenght("+validation.value+")."; 
+	    break;
+	  default:
+	    
+	}
+	return errorMessage;
+};
+
+
 
 const createCardHeader = function(className,title){
      var row = $('<div/>',{class:'row'});  
@@ -304,7 +516,7 @@ const selectInput = function(element){
    		if(element.value !== ''){
             var seletedOption = $('<option/>').text(element.placeHolder).appendTo(selectInput);
             }else{
-            var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);
+            var seletedOption = $('<option/>', {selected : 'selected',disabled : 'disabled'}).text(element.placeHolder).appendTo(selectInput);
             }
 		var options = [];
 		$.each(element.options, function (key, val) {

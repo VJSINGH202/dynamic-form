@@ -11,6 +11,11 @@
 	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
 	crossorigin="anonymous">
 <title>DynamicForm :: Form</title>
+<style type="text/css">
+ div.is-invalid{
+   color: red;
+ }
+</style>
 </head>
 <body>
 	<div class="container">
@@ -32,6 +37,11 @@
 $(document).ready(function() {
     console.log( "ready!" );
     getJson("${className}");
+    $.validator.setDefaults({
+		submitHandler: function() {
+			alert("submitted!");
+		}
+	});
 });
 
 function getJson(className){
@@ -276,6 +286,18 @@ function passwordInput(element){
 	return inputWrapper;
 }
 </script> -->
+<script type="text/javascript" src="/js/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/js/script.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    console.log( "ready!" );
+    /*$.validator.setDefaults({
+		submitHandler: function() {
+			alert("submitted!");
+		}
+	});*/
+});
+</script>
+
 </body>
 </html>
