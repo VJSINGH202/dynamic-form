@@ -9,7 +9,7 @@
 </c:url>
 
  <!DOCTYPE html>
-<html >
+<html>
 <head>
 <meta charset="ISO-8859-1">
 <title>Document List</title>
@@ -29,7 +29,7 @@
 	
 	</div>
 </div>
-
+<script type="text/javascript"></script>
 <script>
 $(document).ready(function(){
 	// $('#data-table').DataTable();	
@@ -119,6 +119,8 @@ function getHeaderV2(){
 	});
 
 }
+
+
 function checkAll(event){
 	if(event.target.checked){
 		$('.checkSingle').each(function(){
@@ -180,7 +182,7 @@ function checkAll(event){
 							});							
 					});
 //					tr.append("<td><a class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
-					tr.append("<td><a class='btn btn-md text-success' href='${contextPath}/dynamic/generate?id="+value.id+"&className="+getclassName+"' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='#' onclick=deleteEntity('"+value.id+"','"+getclassName+"',event) class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a></td>");
+					tr.append("<td><a class='btn btn-md text-success' href='${contextPath}/dynamic/generate?id="+value.id+"&className="+getclassName+"' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='#' onclick=deleteEntity('"+value.id+"','"+getclassName+"',event) class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a><a class='btn btn-md text-primary' href='${contextPath}/dynamic/view?id="+value.id+"&className="+getclassName+"' data-toggle='tooltip' data-placement='top' title='View'><i class='fal fa-eye'></i></a></td>");
 					tr.appendTo(tbody);				
 				});
 				
@@ -197,15 +199,22 @@ function checkAll(event){
 	function deleteMultiple(event){
 		
 		var deleteId=[];
+		var deleteIdRow=[];
 		 var table=$('#data-table').DataTable();
 	     console.log(event.target);
+	     console.log('inside delete:');
 		 var tableRow = $(event.target).parent().parent().parent();
+		 console.log(tableRow);
 		$('.checkSingle').each(function(){
 			if(this.checked==true){
 				
 				deleteId.push(this.value);
+				deleteIdRow.push($(this).parent().parent());
+				console.log($(this).parent().parent());
 			}
 		});
+		
+		console.log(deleteIdRow);
 		alert(getclassName);
 		console.log("deletedId's: "+deleteId);
 		
@@ -217,14 +226,24 @@ function checkAll(event){
 				className:getclassName
 			},
 			success:function(data){
-				console.log(data);
-				table.row(tableRow).remove().draw();
+				console.log("Success delete data : "+data);
+				///table.row(tableRow).remove().draw();
+				//table.clear().draw();
+				remove(deleteIdRow,table);
+				//getHeaderV2();
 			},
 			error:function(data){
-				console.log(data)
+				console.log("Error delete data : "+data);
 			}
-		})
+		});
 	}
+	
+	const remove = function(rows,table){
+		$(rows).each(function(k,v){
+			table.row(v).remove();
+		});
+		table.draw();
+	};
 	
 	function checkdelete(event){
 		
@@ -246,9 +265,9 @@ function checkAll(event){
 
 	function isSelectable(data){
 		if(data.selectable!=data.listIndex){
-			if(data.selectable==true && data.listIndex==false)
+			if(data.selectable==true && data.listIndex == false)
 				return "selectable";
-			if(data.selectable==false && data.listIndex==true)
+			if(data.selectable==false && data.listIndex == true)
 				return "listIndex";
 		}
 		else if((data.selectable==data.listIndex) && (data.selectable==false)){
@@ -257,6 +276,7 @@ function checkAll(event){
 
 
 	}
+	
  function update (id){
 	 console.log("inside update method: "+id);
 	 //console.log("className:"+className);
@@ -277,7 +297,7 @@ function checkAll(event){
 	 }) 
  }
 	
- function deleteEntity(id,event){
+ function deleteEntity(id,className,event){
 	 console.log(id);
 	// console.log(className);
 	 var table=$('#data-table').DataTable();
@@ -299,7 +319,7 @@ function checkAll(event){
 	 	error:function(data){
 	 		console.log(data);
 	 	}
-	 })
+	 });
  }
 /* function getList(className,header){
 		console.log(className);		

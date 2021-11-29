@@ -64,26 +64,27 @@ public class DynamicFormController {
 	public String getForm(@PathVariable String className) {
 		System.out.println("Printing the className : " + className);
 		String formJson = jetFormService.getFormJson(className);
-		System.out.println("form json in new record method"+formJson);
+		System.out.println("form json in new record method" + formJson);
 		return formJson;
 	}
-	
-	@GetMapping( value="/getJson",produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody JetFormWrapper getJsonWithFormValues(@RequestParam("id") String id, @RequestParam("className") String className) {
+
+	@GetMapping(value = "/getJson", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JetFormWrapper getJsonWithFormValues(@RequestParam("id") String id,
+			@RequestParam("className") String className) {
 		System.out.println("id and class name in update method: ");
-		System.out.println(id+className);
+		System.out.println(id + className);
 		JetFormWrapper formWrapper = jetFormService.getFormWrapperWithValues(Long.valueOf(id), className);
 //		System.out.println("Form Wrapper"+formWrapper);
 //		Gson gson=new Gson();
 //				
 		return formWrapper;
 	}
-	
+
 	@GetMapping("/generate")
 	public String getForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
-		System.out.println("classname received to update form"+dynamicForm.getClassName());
-		System.out.println("id of the entity:"+dynamicForm.getId());
-		
+		System.out.println("classname received to update form" + dynamicForm.getClassName());
+		System.out.println("id of the entity:" + dynamicForm.getId());
+
 		return "form";
 	}
 
@@ -125,9 +126,29 @@ public class DynamicFormController {
 
 		System.out.println("id: " + id + "  className: " + className);
 		JetFormWrapper formWrapper = jetFormService.getFormWrapperWithValues(Long.valueOf(id), className);
-		System.out.println("Form Wrapper"+formWrapper);
-		Gson gson=new Gson();
-				
+		System.out.println("Form Wrapper" + formWrapper);
+		Gson gson = new Gson();
+
+		return gson.toJson(formWrapper);
+	}
+
+	@GetMapping("/view")
+	public String viewEntity(@RequestParam("id") String id, @RequestParam("className") String className) {
+		System.out.println("id : " + id);
+		System.out.println("className : " + className);
+
+		return "view";
+	}
+
+	@GetMapping(value = "/jview", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody String viewEntityJson(@RequestParam("id") String id,
+			@RequestParam("className") String className) {
+
+		System.out.println("id: " + id + "  className: " + className);
+		JetFormWrapper formWrapper = jetFormService.getFormWrapperWithValues(Long.valueOf(id), className);
+		System.out.println("Form Wrapper" + formWrapper);
+		Gson gson = new Gson();
+
 		return gson.toJson(formWrapper);
 	}
 
@@ -136,71 +157,68 @@ public class DynamicFormController {
 	 * { System.out.println("inside : "); System.out.println(data); return null; }
 	 */
 
-	
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public @ResponseBody String saveEntity(@RequestBody MultiValueMap<String, Object> formData,Model model) {
- 
+	public @ResponseBody String saveEntity(@RequestBody MultiValueMap<String, Object> formData, Model model) {
+
 		String className = formData.get("className").get(0).toString();
 		Object saveEntity = jetFormService.saveEntity(formData);
 		System.out.println("formData : " + formData);
 		System.out.println(saveEntity);
 		model.addAttribute("className", className);
 		return "list";
-		//return "index";
+		// return "index";
 	}
-	
-	//, consumes = MediaType.APPLICATION_JSON_VALUE
-	/*@RequestMapping(value = "/create", method = RequestMethod.POST)
-	@ResponseBody
-	public String saveEntity(@RequestParam String formData, @RequestParam String className) {
- 
-		System.out.println(formData.toString());
-		Object saveEntity;
-		Class<?> clazz;
-		try {
-			clazz = Class.forName(className);
-			Object readValue = new ObjectMapper().readValue(formData, clazz);  
-			saveEntity = jetFormService.saveEntity(readValue);
-			System.out.println("Saved entity : "+ saveEntity);
-		} catch (ClassNotFoundException | JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		/*
-		 * JSONArray array = new JSONArray(formData); JSONObject object =
-		 * array.getJSONObject(formData);
-		 */
-		/*
-		 * String className = formData.get("className").get(0).toString(); Object
-		 * saveEntity = jetFormService.saveEntity(formData);
-		 * System.out.println("formData : " + formData); System.out.println(saveEntity);
-		 * model.addAttribute("className", className);
-		 */
-		//return "list";
-		//return "index";
-	//}*/
-	
-	@GetMapping(value="/delete")
-	public @ResponseBody String deleteEntity(@RequestParam("id") Long id,@RequestParam("className") String className ) {
-		
+
+	// , consumes = MediaType.APPLICATION_JSON_VALUE
+	/*
+	 * @RequestMapping(value = "/create", method = RequestMethod.POST)
+	 * 
+	 * @ResponseBody public String saveEntity(@RequestParam String
+	 * formData, @RequestParam String className) {
+	 * 
+	 * System.out.println(formData.toString()); Object saveEntity; Class<?> clazz;
+	 * try { clazz = Class.forName(className); Object readValue = new
+	 * ObjectMapper().readValue(formData, clazz); saveEntity =
+	 * jetFormService.saveEntity(readValue); System.out.println("Saved entity : "+
+	 * saveEntity); } catch (ClassNotFoundException | JsonProcessingException e) {
+	 * // TODO Auto-generated catch block e.printStackTrace(); }
+	 * 
+	 * /* JSONArray array = new JSONArray(formData); JSONObject object =
+	 * array.getJSONObject(formData);
+	 */
+	/*
+	 * String className = formData.get("className").get(0).toString(); Object
+	 * saveEntity = jetFormService.saveEntity(formData);
+	 * System.out.println("formData : " + formData); System.out.println(saveEntity);
+	 * model.addAttribute("className", className);
+	 */
+	// return "list";
+	// return "index";
+	// }*/
+
+	@GetMapping(value = "/delete")
+	public @ResponseBody String deleteEntity(@RequestParam("id") Long id, @RequestParam("className") String className) {
+
 		boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
 		return status ? "Deleted" : "Something went wrong";
 	}
-	@RequestMapping(value="/deletemultiple")
-	public @ResponseBody String deleteMultiple(@RequestParam("deleteId[]") Long []deletedIdArray,@RequestParam("className")String className) {
-		
-		for(Long id:deletedIdArray)
-			
-		System.out.println(id);
+
+	@RequestMapping(value = "/deletemultiple")
+	public @ResponseBody String deleteMultiple(@RequestParam("deleteId[]") Long[] deletedIdArray,
+			@RequestParam("className") String className) {
+
+		for (Long id : deletedIdArray)
+
+			System.out.println(id);
 		System.out.println(className);
+
 		try {
 			jetFormService.deleteMultiple(deletedIdArray, className);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+		} catch (ClassNotFoundException e) { // TODO Auto-generated catch block
 			e.printStackTrace();
 			return "something went wrong";
 		}
+
 		System.out.println("after delte method call");
 		return "deleted";
 	}

@@ -103,7 +103,7 @@ const formValidation = function(elements,form){
       var messages = createValidationMessages(validationsMap);
      // $("#commentForm").validate();
       $(form).validate({
-           rules: rules,
+          rules: rules,
 		  messages: messages,
 		  errorClass: "is-invalid",
 		  onsubmit: true,
@@ -116,7 +116,7 @@ const formValidation = function(elements,form){
           var element = $(element);
           console.log("printing the sib"+ JSON.stringify(element.nextSibling));
           console.log($(element.form));
-           console.log($(element).siblings("div"))
+          console.log($(element).siblings("div"))
           console.log($(element).next());
           console.log($(element).next().next());
           console.log(errorClass);
@@ -220,7 +220,7 @@ const createValidationObject = function(validationArray){
          if((n['type']).toLowerCase()=== 'required'){
             validationObject[(n['type']).toLowerCase()] = getBool(n['value']);
          }else{
-            validationObject[(n['type']).toLowerCase()] = n['value'];
+            validationObject[(n['type']).toLowerCase()] = parseInt(n['value']);
          } 
 	  });
       console.log("printing the validation object : "+ JSON.stringify(validationObject));
