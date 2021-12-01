@@ -176,8 +176,17 @@ function checkAll(event){
 //					console.log("each attribute of row: "+ k)
 							$.each(header,function(ky,val){
 								if(val == k){
-									console.log(k);									
-									tr.append("<td>"+v+"</td>");
+									console.log(k);	
+									
+									if(checkDateType(v)){
+										tr.append("<td>"+convertDate(v)+"</td>");
+									}else{
+										
+										tr.append("<td>"+v+"</td>");
+									}
+									
+									console.log("Printing : "+typeof v);
+									checkDateType(v);
 								}
 							});							
 					});
@@ -237,6 +246,36 @@ function checkAll(event){
 			}
 		});
 	}
+	
+	const checkDateType = function(date){
+		if(typeof date === 'object'){
+			console.log('inside');
+			return true;
+		}
+	};
+	
+  const formatDate = function(date) {
+	 
+		var javadateTime = new Date(date);
+		var day = ("0" + javadateTime.getDate()).slice(-2);
+		var month = ("0" + (javadateTime.getMonth() + 1)).slice(-2);
+		return javadateTime.getFullYear() + "-" + (month) + "-" + (day);
+	}
+	
+	const convertDate = function(date){
+		console.log('inside convertDate');
+		console.log(date);
+		var date = date;
+		var day = date.day;
+		var month = date.month - 1; // Month is 0-indexed
+		var year = date.year;
+
+		var date = new Date(Date.UTC(year, month, day));
+		 date  = formatDate(date);
+		console.log('inside convertDate');
+		console.log(date); // "2016-11-15T00:00:00.000Z"
+		return date;
+	};
 	
 	const remove = function(rows,table){
 		$(rows).each(function(k,v){

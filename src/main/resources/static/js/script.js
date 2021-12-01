@@ -27,7 +27,7 @@ const getClassName = function(){
 
 }
 
-const getUpdateForm=function(id,className){
+const getUpdateForm = function(id,className){
 	console.log(id+className);
 	$.ajax({
 		type:"GET",
@@ -462,6 +462,12 @@ const checkInputType = function(element){
 		    result = selectInput(element);
 		    console.log(result);
 		    break;
+      case 'date':
+           // code block
+		    console.log("date");
+		    result = dateInput(element);
+		    console.log(result);
+   			break;
 	  case 'form':
 		    // code block
 		    console.log("form");
@@ -575,6 +581,44 @@ const numberInput = function(element){
 		var numberInput = $('<input/>').attr({ type: 'number',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
 	return inputWrapper;
 }
+
+const dateInput = function(element){
+	var element = element
+	var readOnly = element.readOnly ? 'readonly' : false;
+	var disabled = element.disabled ? 'disabled' : false;
+	
+	checkDateType(element.value);
+		var inputWrapper = $('<div/>', {class : 'mb-3'});
+		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
+		label.appendTo(inputWrapper);
+		var dateInput = $('<input/>').attr({ type: 'text',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
+	    $( dateInput ).datepicker({
+		      changeMonth: true,
+		      changeYear: true,
+		      dateFormat: element.format
+   		 });
+	    formatDate(dateInput,element.format);
+	return inputWrapper;
+}
+
+const checkDateType = function(date){
+     console.log(typeof Object);
+};
+
+const formatDate = function(dateInput,format){
+         console.log('printing dateInput');
+         console.log(dateInput);
+         console.log('printing date format : '+format);
+		$(dateInput).on("change", function() {
+		console.log("printing the date value : "+this.value);
+		console.log('printing the format'+format);
+		    this.setAttribute("data-date",moment(this.value).format(format))
+		    //this.value = moment(new Date(this.value)).format(format);
+		    console.log(moment(new Date(this.value)).format(format));
+		    console.log(moment(this.value,'yyyy-mm-dd'));
+		    console.log(moment(this.value).format(format));
+		}).trigger("change")
+};
 
 const emailInput = function(element){
 	var element = element

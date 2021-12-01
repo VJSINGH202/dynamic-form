@@ -15,5 +15,12 @@ public class HomeController {
 		  System.out.println("hello");
 	      return "index"; 
 	  }
+	  
+	  @RequestMapping("/test") 
+	  public String test(Model model) {
+		 // model.addAttribute("dynamicForm", new DynamicForm());
+		 // System.out.println("hello");
+	      return "test"; 
+	  }
 	 
 }
