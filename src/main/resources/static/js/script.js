@@ -1,5 +1,6 @@
 $(document).ready(function() {
-    console.log( "External js : " );
+
+    console.log("inside external")
     getClassName();
 });
 
@@ -70,6 +71,7 @@ const getNewForm = function(className){
 
 const form = function(form,className){
 	console.log(form);
+	console.log(typeof form)
 	console.log(form.elements);
 	var elements = form.elements;
 	var action = getFormAction(form.actions);
@@ -79,20 +81,23 @@ const form = function(form,className){
 	      createCardHeader(className,form.title).appendTo(cardHeader);
 	    //createCardHeader.appendTo(cardHeader);
 	var cardBody = $('<div/>',{class:'card-body'}).appendTo(card);
-	//action : action.name,
+	//action : action.name, action is object with all annotation parameter 
+	//,enctype:'multipart/form-data'
 	var form = $('<form/>', {action : action.name, method : 'POST' ,id : form.id , name : form.name}).appendTo(cardBody);
 	  $('<input/>',{type:'hidden',name : 'className',value : className}).appendTo(form);
-	  
+	  console.log("Type of form : ")
+	  console.log(typeof form)
+	  console.log(form)
 	  createFormFields(elements,form);
 	  createSubmitButton(action,form);
 	  formValidation(elements,form);
 	//  onFormSubmit(action,form,className);
 }
 
-const formValidation = function(elements,form){
+/*const formValidation = function(elements,form){
       console.log("printing validation data : "+ JSON.stringify(elements));
      // $.each(elements,function(key,value){
-         // var indexed_array = {};
+     // var indexed_array = {};
      // });
       var validationsMap = {};
       $.map(elements, function(n, i){
@@ -129,14 +134,14 @@ const formValidation = function(elements,form){
 						    console.log($(element.nextSibling));
 				    },
          unhighlight: function(element, errorClass, validClass) {
-         /*console.log(element);
+         console.log(element);
           console.log(errorClass);
-          console.log(validClass);*/
+          console.log(validClass);
           console.log("unhighlight");
           $(element).removeClass(errorClass).addClass(validClass);    
-                           /* $(element).removeClass(errorClass).addClass(validClass);    
+                            $(element).removeClass(errorClass).addClass(validClass);    
 						    $(element.nextSibling).removeClass("invalid-feedback").addClass("valid-feedback").text("Look Ok.");
-						    $(element.form).find("label[for=" + element.id + "]").removeClass(errorClass);*/
+						    $(element.form).find("label[for=" + element.id + "]").removeClass(errorClass);
                     },
           errorPlacement: function(error, element) {
                            console.log("printing the errorPlacement : ");
@@ -149,7 +154,7 @@ const formValidation = function(elements,form){
 		  messages: messages
 		  
          });
-         /* $(form).submit(function(e){
+          $(form).submit(function(e){
           e.preventDefault();
           });
           
@@ -158,57 +163,201 @@ const formValidation = function(elements,form){
             form.submit();
             
             }
-          form.submit();*/
-          $(form).submit(function(event) {
+          form.submit();
+          $(form).submit(function(e) {
+        	  console.log("serialized form");
+        	  console.log($(this).serialize());
+        	  //console.log(`printing the form.serialize() : ${form.serialize()}`)
+    
+        	// alert();
+
+        	 try{ 
+//        		 var data = new FormData(document.getElementById('people_12345'));
+        		 console.log(form)
+        		 console.log(form[0])
+        		var formData = new FormData(this);
+        		 formData.append('section', 'yoyoy');
+        		 console.log(formData);
+        		 console.log(...formData.entries());
+        		 for (var p of formData) {
+        			  console.log(p);
+        			}
+        		 
+        		 $.each(form[0].elements, function(index, elem){
+                 //Do something here.
+        			// formData.append('section', $(elem).val());
+        			 let inputName = $(elem).attr('name');
+        			 if(inputName !== undefined){
+        				 console.log(`elem : ${$(elem).attr('name')} | value : ${$(elem).val()}`);	
+        				 let val = $(elem).val();
+        				 formData.append(inputName, val);
+        			 }
+        			 
+                 });
+        		 console.log(formData);
+     
+       	  		}
+        	 catch(error){
+        		 console.log(error)
+        	 }
+
+         console.log(`printing the formData : ${formData}`)
             if (form.valid()){
+            	//form.valid()
             console.log($(this).serialize());
-		       /*
-		        $.ajax({
-		            type: form.attr("method"), // use method specified in form attributes
-		            url: form.attr("action"), // use action specified in form attributes
-		            data: form.serialize(), // encodes set of form elements as string for submission
-		            success: function(data) {
-		                // get response from servlet and display on page via jQuery 
-		            }
-		        });
-		       */
+		      
 		       $.ajax({
 				type: form.attr("method"),
 				url: form.attr("action"),
-				data: form.serialize(),
+				data: formData,//form.serialize(),
+				//processData: false,
+				//contentType: false,
 				success:function(data){
 					console.log("response after submit")
 					console.log(data);
 					if(data == 'list')
 					var className = $("[name='className']").val();
 					console.log("Printing the className : "+className);
-					window.location.href = '/dynamic/list?className='+className;
+					//window.location.href = '/dynamic/list?className='+className;
 					//form(data,className);
 				},
 				error:function(data){
 					console.log(data)
 				}
 		
-	      });
-            }
-            event.preventDefault(); // stop form from redirecting to java servlet page
-         });
-};
+	           });
+        	  e.preventDefault();
+          }
+        	//  alert();
+             // stop form from redirecting to java servlet page
+       //  });
+});
+*/
+
+
+//Online Javascript Editor for free
+//Write, Edit and Run your Javascript code using JS Online Compiler
+ 
+
+const formValidation = function(elements,form){
+   console.log("printing validation data : "+ JSON.stringify(elements));
+
+   var validationsMap = {};
+   $.map(elements, function(n, i){
+		  validationsMap[n['name']] = n['validations'];
+	  });
+	  console.log("Printing the validation Map : " + JSON.stringify(validationsMap));
+   var rules = createValidationRules(validationsMap);
+   var messages = createValidationMessages(validationsMap);
+  
+   $(form).validate({
+       rules: rules,
+		  messages: messages,
+		  errorClass: "is-invalid",
+		  onsubmit: true,
+		  validClass: "is-valid",
+       errorElement: "div",
+       highlight: function(element, errorClass, validClass) {
+       console.log(element);
+       console.log($(element));
+       console.log($(element.nextSibling));
+       var element = $(element);
+       console.log("printing the sib"+ JSON.stringify(element.nextSibling));
+       console.log($(element.form));
+       console.log($(element).siblings("div"))
+       console.log($(element).next());
+       console.log($(element).next().next());
+       console.log(errorClass);
+       console.log(validClass);
+       console.log("highlight");
+						    $(element).addClass(errorClass).removeClass(validClass);
+						    $(element.nextSibling).removeClass("valid-feedback").addClass("invalid-feedback");
+						  
+						    console.log($(element.nextSibling));
+				    },
+      unhighlight: function(element, errorClass, validClass) {
+    
+       console.log("unhighlight");
+       $(element).removeClass(errorClass).addClass(validClass);    
+                      
+                 },
+       errorPlacement: function(error, element) {
+                        console.log("printing the errorPlacement : ");
+                        console.log($(element).parent());
+                        error.appendTo( $(element).parent());
+       }
+      });
+      console.log({
+        rules: rules,
+		  messages: messages
+
+      });
+
+       $(form).submit(function(e) {
+     	  console.log("serialized form");
+     	  console.log($(this).serialize());
+
+     	 try{ 
+
+     		 console.log(form)
+     		 console.log(form[0])
+     		var formData = new FormData(this);
+     	
+     		 console.log(...formData.entries());//it will print the list 
+     		 for (var p of formData) {
+     			  console.log(p);
+     			}
+
+    	 }
+     	 catch(error){
+     		 console.log(error)
+     	 }
+
+      console.log(`printing the formData : ${formData} | action : ${form.attr("action")}  | method  : ${form.attr("method")}`)
+         if (form.valid()){
+		      
+		       $.ajax({
+				type: form.attr("method"),
+				url: form.attr("action"),
+				data: formData,//form.serialize()
+				processData: false,
+				contentType: false,
+				success:function(data){
+					console.log("response after submit")
+					console.log(data);
+					if(data == 'list')
+					var className = $("[name='className']").val();
+					console.log("Printing the className : "+className);
+				
+				},
+				error:function(data){
+					
+					console.log('PRinting error')
+					console.log(data)
+				}
+		
+	           });
+     	  e.preventDefault();
+       }
+      
+      e.preventDefault();
+       });
+}
 
 const createValidationRules = function(validationsMap){
     //elements[1].validations
     console.log("Creating the validations : "+ JSON.stringify(validationsMap));
     validationRulesType = {};
      $.each(validationsMap, function(key,value){
-        
+
         if(value != 0){
           console.log("validations : "+JSON.stringify(value));
           console.log("key : "+JSON.stringify(key));
           console.log("validationsMap[key] : "+ JSON.stringify(validationsMap[key]));
           validationRulesType[key] = createValidationObject(value);
         }
-          
-     }); 
+
+     });
      //validationsMap[key]
      console.log("validationRulesType : "+JSON.stringify(validationRulesType));
      return validationRulesType;
@@ -375,7 +524,9 @@ const getFormAction = function(actions){
 	var action = null;
 	$.each(actions,function(key,value){
            if(value.action.toLowerCase() === 'create'){
+        	   console.log('printing actions');
                console.log(value.action);
+               console.log(value);
                action = value;
                return true;
            }
@@ -393,8 +544,10 @@ const createSubmitButton = function(action,form){
 const createFormFields = function(elements,form){
 	
 	console.log("Printing the elements : ");
+	console.log(typeof form);
 	console.log(elements);
 	$.each(elements, function (key, val) {
+        console.log("each value: ");
         console.log(val);
        var result = checkInputType(val);
        if(result !== null){
@@ -413,11 +566,21 @@ const createFormFields = function(elements,form){
 }
 
 const checkInputType = function(element){
+	const fileType =["IMAGE","PDF","EXCEL","WORD","AUDIO","VIDEO"];
 	var result = null;
-	console.log("Printing the element : ");
+	console.log("checking type of element : ");
+	console.log(element.fieldType.toLowerCase())
 	console.log(element);
+	var elementType=element.fieldType.toLowerCase();
+	var accept=null;
+	if(fileType.includes(element.fieldType)){
+		console.log("Array has element: ")
+		console.log(element.fieldType)
+		elementType="file";
+		accept=element.fieldType.toLowerCase()+'/*';
+	}
 	var element = element;
-	switch(element.fieldType.toLowerCase()) {
+	switch(elementType) {
 	  case 'number':
 	    // code block
 	    console.log("number");
@@ -456,18 +619,28 @@ const checkInputType = function(element){
 	    console.log(result);
 		    console.log("checkbox");
 		    break;
+		    
 	  case 'select':
 		    // code block
 		    console.log("select");
 		    result = selectInput(element);
 		    console.log(result);
 		    break;
+		    
       case 'date':
            // code block
 		    console.log("date");
 		    result = dateInput(element);
 		    console.log(result);
    			break;
+   			
+      case 'file':
+    	  	console.log('element is file type');
+    	  	result=fileInput(element,accept);
+    	  	console.log("result: ");
+    	  	console.log(result);
+    	  	break;
+
 	  case 'form':
 		    // code block
 		    console.log("form");
@@ -582,6 +755,55 @@ const numberInput = function(element){
 	return inputWrapper;
 }
 
+const fileInput = function(element,accept){
+	console.log("only accept");
+	console.log(accept);
+	var element = element;
+	var readOnly= element.readOnly ? 'readonly' : false;
+	//var disable= element.disabled ? 'disabled' : false;
+		var inputWrapper= $('<div/>',{class : 'mb-3'});
+//		var label= $('<label/>',{for : element.id,class : ''}).text(element.label);
+		var label= $('<label/>',{class : 'form-label'}).text(element.label).appendTo(inputWrapper);
+		var filelabel= $('<label/>',{class : 'input-group'});
+		        filelabel.appendTo(inputWrapper);
+		var fileInput = $('<input>/').attr({ type: 'file',class:'d-none',name : element.name, accept:accept}).appendTo(filelabel);
+		fileOnClick(fileInput);
+		var span = $('<span/>',{class:'input-group-text'}).text('Choose '+element.label).appendTo(filelabel);
+		var filePathInput = $('<input>/').attr({ type: 'text',class: 'form-control d-inline-block bg-white',id: element.id, name : element.name ,readonly : true}).appendTo(filelabel);
+	return inputWrapper;
+}
+
+const fileOnClick = function(file){
+	$(document).on('change',file,function(){
+	    //alert("button");
+		console.log(file);
+		console.log($(file));
+		console.log($(file).val());
+		console.log($(file).prop("files")[0]);
+		var fileData = $(file).prop("files")[0];
+		console.log(fileData);
+		//var file_data = $('#inputfile').prop('files')[0];   
+        var form_data = new FormData();                  
+        form_data.append('file', fileData);
+        $.ajax({
+            url: "uploadFile",
+            type: "POST",
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData:false,
+            success: function(data){
+                console.log(data);
+                console.log($(file).next().next().val(data));
+            },
+            error:function(error){
+            	console.log("printing error");
+            	console.log(error);
+            }
+        });
+	});   
+};
+
 const dateInput = function(element){
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
@@ -629,7 +851,7 @@ const emailInput = function(element){
 		     label.appendTo(inputWrapper);
 		var emailInput = $('<input/>').attr({ type: 'email',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
 	return inputWrapper;
-}
+};
 
 const passwordInput = function(element){
 	var element = element
@@ -640,4 +862,4 @@ const passwordInput = function(element){
 		    label.appendTo(inputWrapper);
 		var passwordInput = $('<input/>').attr({ type: 'password',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
 	return inputWrapper;
-}
+};

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.adject.dynamicform.modal.DynamicForm;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,27 +39,29 @@ public class DynamicFormController {
 	@Autowired
 	private FormRenderer formRenderer;
 
-	@PostMapping("/generate")
-	public String generateForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
+//	@PostMapping("/generate")
+//	public String generateForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
+//
+//		JetFormWrapper form = formRenderer.getForm(dynamicForm.getClassName());
+//		Object newInstance = null;
+//		try {
+//			Class<?> forName = Class.forName(dynamicForm.getClassName());
+//			newInstance = forName.getDeclaredConstructor().newInstance();
+//		} catch (Exception e) {
+//			e.getStackTrace();
+//		}
+//
+//		// new Gson().toJson(form);
+//		System.out.println(dynamicForm);
+//		model.addAttribute("dy", dynamicForm);
+//		model.addAttribute("form", form);
+//		model.addAttribute("modalClass", newInstance);
+//		model.addAttribute("json", new Gson().toJson(form));
+//		return "home";
+//	}
 
-		JetFormWrapper form = formRenderer.getForm(dynamicForm.getClassName());
-		Object newInstance = null;
-		try {
-			Class<?> forName = Class.forName(dynamicForm.getClassName());
-			newInstance = forName.getDeclaredConstructor().newInstance();
-		} catch (Exception e) {
-			e.getStackTrace();
-		}
-
-		// new Gson().toJson(form);
-		System.out.println(dynamicForm);
-		model.addAttribute("dy", dynamicForm);
-		model.addAttribute("form", form);
-		model.addAttribute("modalClass", newInstance);
-		model.addAttribute("json", new Gson().toJson(form));
-		return "home";
-	}
-
+	
+	// Called for getting form structure
 	@GetMapping(value = "/json/{className}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public String getForm(@PathVariable String className) {
@@ -100,21 +103,21 @@ public class DynamicFormController {
 		return "list";
 	}
 
-	@GetMapping(value = "/load", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody String loadJson(@RequestParam("className") String className) {
-
-//		JetFormWrapper form = formRenderer.getForm(className);
-		String formJson = jetFormService.getFormJson(className);
-//		Gson gson=new Gson();
-//		String json = gson.toJson(form);
-//		model.addAttribute("form", form);
-//		model.addAttribute("json",json);
-		return formJson;
-	}
+//	@GetMapping(value = "/load", produces = MediaType.APPLICATION_JSON_VALUE)
+//	public @ResponseBody String loadJson(@RequestParam("className") String className) {
+//
+////		JetFormWrapper form = formRenderer.getForm(className);
+//		String formJson = jetFormService.getFormJson(className);
+////		Gson gson=new Gson();
+////		String json = gson.toJson(form);
+////		model.addAttribute("form", form);
+////		model.addAttribute("json",json);
+//		return formJson;
+//	}
 
 	@GetMapping(value = "/entityList", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody String getList(@RequestParam("className") String className) {
-		System.out.println("inside list" + className);
+		System.out.println("inside getlist function: " + className);
 		Gson gson = new Gson();
 		String json = gson.toJson(jetFormService.getList(className));
 		System.out.println("Json:" + json);
@@ -157,9 +160,12 @@ public class DynamicFormController {
 	 * { System.out.println("inside : "); System.out.println(data); return null; }
 	 */
 
-	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public @ResponseBody String saveEntity(@RequestBody MultiValueMap<String, Object> formData, Model model) {
+	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody String saveEntity(@RequestParam MultiValueMap<String, Object> formData, Model model) {
+		
 
+		System.out.println("Multiple value map: ");
+		System.out.println(formData);
 		String className = formData.get("className").get(0).toString();
 		Object saveEntity = jetFormService.saveEntity(formData);
 		System.out.println("formData : " + formData);
@@ -167,6 +173,15 @@ public class DynamicFormController {
 		model.addAttribute("className", className);
 		return "list";
 		// return "index";
+	}
+	
+	@PostMapping("/uploadFile")
+	@ResponseBody
+	public String saveFile(@RequestParam("file") MultipartFile multipartFile) {
+		System.out.println(multipartFile.getName());
+		System.out.println(multipartFile.getOriginalFilename());
+		return "Pictures/Tokyo.jpg";
+		
 	}
 
 	// , consumes = MediaType.APPLICATION_JSON_VALUE

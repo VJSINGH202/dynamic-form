@@ -65,11 +65,12 @@ function getHeaderV2(){
 	const  header=[];
 	var table = createTable();
 	$.ajax({
-		url: 'load',
+//		url: 'load',
+		url:'json/'+getclassName,
 		type:'GET',
-		data:{
-			className:getclassName
-		},
+//		data:{
+//			className:getclassName
+//		},
 		success:function(data){
 			 console.log("json response: ")
 			 console.log(data);
