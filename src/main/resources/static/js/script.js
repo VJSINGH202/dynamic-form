@@ -1,9 +1,11 @@
 $(document).ready(function() {
     console.log( "External js : " );
     getClassName();
+    
 });
 
 const getClassName = function(){
+   
     console.log('getting classname : ');
     //it searches the parameter in query string 
     var urlParams = new URLSearchParams(window.location.search);
@@ -219,12 +221,91 @@ const createValidationObject = function(validationArray){
       $.map(validationArray, function(n, i){
          if((n['type']).toLowerCase()=== 'required'){
             validationObject[(n['type']).toLowerCase()] = getBool(n['value']);
+         }else if((n['type']).toLowerCase()=== 'mindate'){
+         addMinDate(n['value']);
+            validationObject[(n['type']).toLowerCase()] = n['value'];
          }else{
             validationObject[(n['type']).toLowerCase()] = parseInt(n['value']);
          } 
 	  });
       console.log("printing the validation object : "+ JSON.stringify(validationObject));
       return validationObject;
+};
+
+const addMinDate = function(date){
+   var inputName;
+   var params;
+	$.validator.addMethod("mindate", function (value, element, params) {
+	    // new Date(-356780166)..
+	    console.log("printing the value"+value);
+	    console.log("printing the min date"+params);
+	    console.log(element.name);
+	     inputName = element.name;
+	     params = params;
+	    console.log(params);
+	    var format = $(element.attributes.format).val();
+	    console.log(format);
+	    console.log("printing the date : ");
+	    
+	    var inputDate = Date.parse(value, format);
+	    console.log(Date.parse(params));
+	    console.log(Date.parse(value));
+	    console.log(inputDate);
+	    var minDate = Date.parse(params, format);
+	    console.log(minDate);
+	    /*var mm = moment(params,format).utc().format('MM-DD-YYYY');
+	    console.log(moment.parseZone(params, format, true).utcOffset());
+	    moment.parseZone(params, format, true).utcOffset();*/
+	    //console.log("printing the moment date : "+mm);
+	   // moment(params,format).utc().format();
+	   //moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
+	   console.log(moment(value, format.toUpperCase()));
+	    console.log(moment(params, format.toUpperCase()));
+	    //moment().toDate();
+	    var min_date =  moment(params, format.toUpperCase())._d;
+	    var input_date = moment(value, format.toUpperCase())._d;
+	    console.log(`min_date : ${min_date} | input_date : ${input_date}`);
+	    // a.diff(b) // a - b < 0
+        // b.diff(a) // b - a > 0
+        console.log("Printing the new date : ");
+        var min_date;
+        var input_date;
+              try {
+              min_date = new Date(min_date);
+              input_date = new Date(input_date)
+              console.log(new Date(min_date));
+              console.log(new Date(input_date));
+                     // code may cause error
+                  } catch(error){
+                     console.log(error);
+                  }
+             
+        console.log((moment(params, format.toUpperCase()) - moment(value, format.toUpperCase())));
+        if (min_date > input_date)
+	    {
+	      console.log(min_date > input_date);
+	        return false;
+	    }
+        //console.log('x < y', x < y); // false
+       /* if (min_date.diff(input_date) > 0)
+	    {
+	      console.log((min_date - input_date));
+	        return true;
+	    }
+	    if (inputDate.compareTo(minDate) === -1)
+	    {
+	      console.log(inputDate.compareTo(minDate));
+	        return false;
+	    }*/
+	    //Date.today().compareTo(Date.parse("yesterday"))            
+	    // 1 = greater, -1 = less than, 0 = equal
+	   //moment(this.value,'yyyy-mm-dd')
+	    //var min = new Date(<?php echo date("U",strtotime("-60 year"));?>);
+	    //var inputDate = new Date(value);
+	    //if (inputDate < min)
+	      //  return false;
+	   // return false;
+	}, "Miniimum "+inputName+" is "+params+".");
 };
 
 const getBool = function(val){ 
@@ -291,6 +372,9 @@ console.log(validation.type.toLowerCase());
 	  case 'maxlenght':
 	   errorMessage = fieldName + " is required maxlenght("+validation.value+")."; 
 	    break;
+      case 'mindate':
+       errorMessage = fieldName + " is required mindate("+validation.value+")."; 
+        break;
 	  default:
 	    
 	}
@@ -541,7 +625,6 @@ const selectInput = function(element){
 		}
 	return inputWrapper;
 }
-
 const radioOrCheckInput = function(element,elementType){
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
@@ -591,13 +674,13 @@ const dateInput = function(element){
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		label.appendTo(inputWrapper);
-		var dateInput = $('<input/>').attr({ type: 'text',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
+		var dateInput = $('<input/>').attr({ type: 'text',class:'form-control',format: element.format , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
 	    $( dateInput ).datepicker({
 		      changeMonth: true,
 		      changeYear: true,
 		      dateFormat: element.format
    		 });
-	    formatDate(dateInput,element.format);
+	   // formatDate(dateInput,element.format);
 	return inputWrapper;
 }
 
@@ -617,7 +700,7 @@ const formatDate = function(dateInput,format){
 		    console.log(moment(new Date(this.value)).format(format));
 		    console.log(moment(this.value,'yyyy-mm-dd'));
 		    console.log(moment(this.value).format(format));
-		}).trigger("change")
+		});//.trigger("change")
 };
 
 const emailInput = function(element){

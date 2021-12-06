@@ -293,6 +293,8 @@ function passwordInput(element){
 }
 </script> -->
 <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/date.js"></script>
+<script type="text/javascript" src="/js/time.js"></script>
 <script type="text/javascript" src="/js/script.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
