@@ -2,6 +2,8 @@ package com.adject.dynamicform.controllers;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -141,6 +143,20 @@ public class DynamicFormController {
 		System.out.println("className : " + className);
 
 		return "view";
+	}
+	
+	@GetMapping("/getAutoCompleteSoruceData")
+	@ResponseBody
+	public List<String> getAutoCompleteSoruceData(
+			                                      @RequestParam("className") String className, 
+			                                      @RequestParam("searchField") String searchField,
+			                                      @RequestParam("inputField") String inputField  ){
+		System.out.println("searchField : " + searchField);
+		System.out.println("className : " + className);
+		System.out.println("inputField : " + inputField);
+                 List<String> autoCompleteSourceData = jetFormService.getAutoCompleteSourceData(className, searchField);
+                 List<String> collect = autoCompleteSourceData.stream().filter(e -> e.startsWith(inputField)).collect(Collectors.toList());
+		return collect;
 	}
 
 	@GetMapping(value = "/jview", produces = MediaType.APPLICATION_JSON_VALUE)

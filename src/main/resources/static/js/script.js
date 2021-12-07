@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
     console.log("inside external")
+    var className;
     getClassName();
     
 });
@@ -18,7 +19,7 @@ const getClassName = function(){
       console.log(urlParams.get('className'));
       console.log("id: ")
       console.log(urlParams.get('id'));
-      const className = urlParams.get('className');
+      className = urlParams.get('className');
       if(id!=null){
       
       	getUpdateForm(id,className);
@@ -510,7 +511,6 @@ console.log(validation.type.toLowerCase());
 	  case 'min':
 		errorMessage = fieldName + " is required min("+validation.value+") size";
 	    break;
-		    break;
       case 'max':
 		errorMessage = fieldName + " is required max("+validation.value+") size";
 		    break;
@@ -749,8 +749,86 @@ const textInput = function(element){
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		            label.appendTo(inputWrapper);
 		var textInput = $('<input/>').attr({ type: 'text',class:'form-control' ,id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
+	
+	console.log(`${element.name} is Autocomplete : ${element.autoComplete}`);
+	    if(element.autoComplete){
+	    console.log(`${element.name} is Autocomplete : ${element.autoComplete}`);
+	      // onAutoCompleteInput(textInput,element.name);
+	       getAutoCompleteSourceData(textInput,element.name);
+	    }
+	
 	return inputWrapper;
 }
+
+
+const onAutoCompleteInput = function(input,fieldName){
+  $(input).on('input', function(){    
+    console.log("onAutoCompleteInput ::");
+    console.log(`ClassName : ${className}`)
+       console.log($(this).val());
+       $.ajax({
+          method: "GET",
+          url: "getAutoCompleteSoruceData",
+          data: {
+            searchField: fieldName,
+            className: className,
+            inputField: $(this).val()
+          },
+          success: function( data ) {
+          console.log(`printing the getAutoCompleteSoruceData : ${data}`);
+          $( input ).autocomplete('option', 'source', data)
+          },
+          error: (error) => {
+            console.log(error);
+          }
+        });
+   });
+};
+
+const getAutoCompleteSourceData = function(input,fieldName){
+     $(input).autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          method: "GET",
+          url: "getAutoCompleteSoruceData",
+          data: {
+            searchField: fieldName,
+            className: className,
+            inputField: request.term
+          },
+          success: function( data ) {
+          console.log(`printing the getAutoCompleteSoruceData : ${data}`);
+            response( data );
+          },
+          error: (error) => {
+            console.log(error);
+          }
+        });
+      },
+      minLength: 1,
+      select: function( event, ui ) {
+        console.log( ui.item ? "Selected: " + ui.item.label : "Nothing selected, input was " + this.value);
+      },
+      open: function() {
+        //$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+      },
+      close: function() {
+        //$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+      }
+    });
+    /* $.ajax({
+        method: "GET",
+        url: "getAutoCompleteSoruceData",
+        data: { className: className, searchField: search },
+        success: (result) => {
+            console.log(`Printing getAutoCompleteSoruceData :: `);
+            console.log(result);
+        },
+        error: (error) => {
+            console.log(error);
+        }
+    });*/
+};
 
 const hiddenInput = function(element){
 	var element = element
@@ -774,8 +852,12 @@ const selectInput = function(element){
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
 		label.appendTo(inputWrapper);
-   		var selectInput = $('<select/>').attr({class:'form-select' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled, multiple:multiple}).appendTo(inputWrapper);
+		//form-select
+   		var selectInput = $('<select/>').attr({class:'chosen-select form-select' , id: element.id, name: element.name, 'data-placeholder' :element.placeHolder ,placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled, multiple:multiple}).appendTo(inputWrapper);
    		//var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);
+   		
+   		//$(selectInput).searchit({textFieldClass:'form-control', noElementText:"No matches"});
+   		
    		if(element.value !== ''){
             var seletedOption = $('<option/>').text(element.placeHolder).appendTo(selectInput);
             }else{
@@ -796,6 +878,7 @@ const selectInput = function(element){
             	val.appendTo(selectInput);
             });
 		}
+		$(selectInput).chosen({width: "100%"});
 	return inputWrapper;
 }
 const radioOrCheckInput = function(element,elementType){
@@ -835,6 +918,7 @@ const numberInput = function(element){
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		label.appendTo(inputWrapper);
 		var numberInput = $('<input/>').attr({ type: 'number',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
+	    
 	return inputWrapper;
 }
 

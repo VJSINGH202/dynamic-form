@@ -12,9 +12,12 @@
 	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
 	crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css"></link>
+<link rel="stylesheet" type="text/css" href="/css/style.css"></link>
+<link rel="stylesheet" type="text/css" href="/css/prism.css"></link>
+<link rel="stylesheet" type="text/css" href="/css/chosen.css"></link>
 <link href="/images/*"></link>
 <title>DynamicForm :: Form</title>
-<!-- <style type="text/css" src="/css/jquery-ui.css"></style> -->
+<!-- <style type="text/css" src="/css/jquery-ui.css"></style>  jquery.searchinput.css -->
 <style type="text/css">
  div.is-invalid{
    color: red;
@@ -295,6 +298,9 @@ function passwordInput(element){
 <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/js/date.js"></script>
 <script type="text/javascript" src="/js/time.js"></script>
+<script type="text/javascript" src="/js/chosen.jquery.js"></script>
+<script type="text/javascript" src="/js/prism.js"></script>
+<script type="text/javascript" src="/js/init.js"></script>
 <script type="text/javascript" src="/js/script.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
