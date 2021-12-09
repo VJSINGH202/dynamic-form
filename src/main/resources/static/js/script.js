@@ -328,10 +328,11 @@ const formValidation = function(elements,form){
 				success:function(data){
 					console.log("response after submit")
 					console.log(data);
-					if(data == 'list')
-					var className = $("[name='className']").val();
-					console.log("Printing the className : "+className);
-				
+					if(data == 'list'){
+						var className = $("[name='className']").val();
+						console.log("Printing the className : "+className);
+						//window.location.href = '/dynamic/list?className='+className;
+					}	
 				},
 				error:function(data){
 					
@@ -750,7 +751,7 @@ const textInput = function(element){
 		            label.appendTo(inputWrapper);
 		var textInput = $('<input/>').attr({ type: 'text',class:'form-control' ,id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
 	
-	console.log(`${element.name} is Autocomplete : ${element.autoComplete}`);
+	    console.log(`${element.name} is Autocomplete : ${element.autoComplete}`);
 	    if(element.autoComplete){
 	    console.log(`${element.name} is Autocomplete : ${element.autoComplete}`);
 	      // onAutoCompleteInput(textInput,element.name);
@@ -760,7 +761,7 @@ const textInput = function(element){
 	return inputWrapper;
 }
 
-
+/*
 const onAutoCompleteInput = function(input,fieldName){
   $(input).on('input', function(){    
     console.log("onAutoCompleteInput ::");
@@ -784,7 +785,7 @@ const onAutoCompleteInput = function(input,fieldName){
         });
    });
 };
-
+*/
 const getAutoCompleteSourceData = function(input,fieldName){
      $(input).autocomplete({
       source: function( request, response ) {
@@ -927,31 +928,58 @@ const fileInput = function(element,accept){
 	console.log(accept);
 	var element = element;
 	var readOnly= element.readOnly ? 'readonly' : false;
-	//var disable= element.disabled ? 'disabled' : false;
+	var disable= element.disabled ? 'disabled' : false;
+	var uploadPath = element.dataProvider.path;
 		var inputWrapper= $('<div/>',{class : 'mb-3'});
-//		var label= $('<label/>',{for : element.id,class : ''}).text(element.label);
-		var label= $('<label/>',{class : 'form-label'}).text(element.label).appendTo(inputWrapper);
-		var filelabel= $('<label/>',{class : 'input-group'});
-		        filelabel.appendTo(inputWrapper);
-		var fileInput = $('<input>/').attr({ type: 'file',class:'d-none',name : element.name, accept:accept}).appendTo(filelabel);
-		fileOnClick(fileInput);
-		var span = $('<span/>',{class:'input-group-text'}).text('Choose '+element.label).appendTo(filelabel);
-		var filePathInput = $('<input>/').attr({ type: 'text',class: 'form-control d-inline-block bg-white',id: element.id, name : element.name ,readonly : true}).appendTo(filelabel);
+		var label= $('<label/>',{for : element.id,class : ''}).text(element.label).appendTo(inputWrapper);
+		
+		
+		var fileInput = $('<input>/').attr({ type: 'file',class:'form-control', accept:accept}).appendTo(inputWrapper);
+		fileOnClick(fileInput,uploadPath);
+		var filePathInput = $('<input>/').attr({ type: 'text',class: 'd-none',id: element.id, name : element.name}).appendTo(inputWrapper);
 	return inputWrapper;
 }
 
-const fileOnClick = function(file){
-	$(document).on('change',file,function(){
-	    //alert("button");
+//const fileInput = function(element,accept){  
+//	console.log("only accept");
+//	console.log(accept);
+//	var element = element;
+//	var readOnly= element.readOnly ? 'readonly' : false;
+//	//var disable= element.disabled ? 'disabled' : false;
+//		var inputWrapper= $('<div/>',{class : 'mb-3'});
+////		var label= $('<label/>',{for : element.id,class : ''}).text(element.label);
+//		var label= $('<label/>',{class : 'form-label'}).text(element.label).appendTo(inputWrapper);
+//		var filelabel= $('<label/>',{class : 'input-group'});
+//		        filelabel.appendTo(inputWrapper);
+//		var fileInput = $('<input>/').attr({ type: 'file',class:'d-none',name : element.name, accept:accept}).appendTo(filelabel);
+//		fileOnClick(fileInput);
+//		var span = $('<span/>',{class:'input-group-text'}).text('Choose '+element.label).appendTo(filelabel);
+//		var filePathInput = $('<input>/').attr({ type: 'text',class: 'form-control d-inline-block bg-white',id: element.id, name : element.name ,readonly : true}).appendTo(filelabel);
+//	return inputWrapper;
+//}
+
+const fileOnClick = function(file,uploadPath){
+	var file = file;
+	
+	console.log("file click method");
 		console.log(file);
-		console.log($(file));
-		console.log($(file).val());
-		console.log($(file).prop("files")[0]);
-		var fileData = $(file).prop("files")[0];
+	$(file).on('input',function(){
+	    //alert("button");
+		//console.log(file);
+		//console.log($(file));
+		//console.log($(file).val());
+		//console.log($(file).prop("files")[0]);
+		console.log($(this));
+		console.log($(this).prop("files")[0]);
+		var fileData = $(this).prop("files")[0];
+		//var fileData = $(file).prop("files")[0];
 		console.log(fileData);
 		//var file_data = $('#inputfile').prop('files')[0];   
+		
+		//var file = {file:fileData,uploadPath:uploadPath};
         var form_data = new FormData();                  
         form_data.append('file', fileData);
+        form_data.append('uploadPath', uploadPath);
         $.ajax({
             url: "uploadFile",
             type: "POST",
@@ -961,7 +989,7 @@ const fileOnClick = function(file){
             processData:false,
             success: function(data){
                 console.log(data);
-                console.log($(file).next().next().val(data));
+                console.log($(file).next().val(data));
             },
             error:function(error){
             	console.log("printing error");

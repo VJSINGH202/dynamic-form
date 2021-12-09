@@ -1,5 +1,6 @@
 package com.adject.dynamicform.controllers;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collector;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.adject.dynamicform.modal.DynamicForm;
+import com.adject.dynamicform.model.UploadFileDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -29,7 +31,9 @@ import com.google.gson.Gson;
 import io.jetform.core.annotation.model.FormElementWrapper;
 import io.jetform.core.annotation.model.JetFormWrapper;
 import io.jetform.core.engine.helper.FormRenderer;
+import io.jetform.core.entity.DocumentMedia;
 import io.jetform.core.entity.Employee;
+import io.jetform.core.repository.DocumentMediaRepo;
 import io.jetform.core.service.JetFormService;
 
 @Controller
@@ -40,6 +44,8 @@ public class DynamicFormController {
 
 	@Autowired
 	private FormRenderer formRenderer;
+	
+	
 
 //	@PostMapping("/generate")
 //	public String generateForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
@@ -155,7 +161,8 @@ public class DynamicFormController {
 		System.out.println("className : " + className);
 		System.out.println("inputField : " + inputField);
                  List<String> autoCompleteSourceData = jetFormService.getAutoCompleteSourceData(className, searchField);
-                 List<String> collect = autoCompleteSourceData.stream().filter(e -> e.startsWith(inputField)).collect(Collectors.toList());
+                 List<String> collect = autoCompleteSourceData.stream().filter(e -> e.toLowerCase().startsWith(inputField.toLowerCase())).collect(Collectors.toList());
+                 System.out.println("collect in  controller: "+collect);
 		return collect;
 	}
 
@@ -176,7 +183,7 @@ public class DynamicFormController {
 	 * { System.out.println("inside : "); System.out.println(data); return null; }
 	 */
 
-	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/create", method = RequestMethod.POST)//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody String saveEntity(@RequestParam MultiValueMap<String, Object> formData, Model model) {
 		
 
@@ -191,15 +198,16 @@ public class DynamicFormController {
 		// return "index";
 	}
 	
-	@PostMapping("/uploadFile")
+	@PostMapping(value="/uploadFile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
-	public String saveFile(@RequestParam("file") MultipartFile multipartFile) {
-		System.out.println(multipartFile.getName());
-		System.out.println(multipartFile.getOriginalFilename());
-		return "Pictures/Tokyo.jpg";
-		
+	public String saveFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("uploadPath") String uploadPath) throws IOException {
+			//UploadFileDto uploadFileDto = new UploadFileDto(multipartFile,uploadPath);
+		//System.out.println(uploadFileDto);
+		DocumentMedia savedDocument = jetFormService.saveDocument(multipartFile,uploadPath);
+		return savedDocument.getFilePath();
+			//return "1111";
 	}
-
+///uploadPath
 	// , consumes = MediaType.APPLICATION_JSON_VALUE
 	/*
 	 * @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -252,6 +260,6 @@ public class DynamicFormController {
 
 		System.out.println("after delte method call");
 		return "deleted";
-	}
-
+	}	
+	
 }
