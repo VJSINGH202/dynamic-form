@@ -725,7 +725,12 @@ const checkInputType = function(element){
     	  	console.log("result: ");
     	  	console.log(result);
     	  	break;
-
+      case 'text_area':
+    	  	console.log('element is textarea type');
+    	  	result=textAreaInput(element);
+    	  	console.log("result: ");
+    	  	console.log(result);
+    	  	break;
 	  case 'form':
 		    // code block
 		    console.log("form");
@@ -1056,5 +1061,16 @@ const passwordInput = function(element){
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		    label.appendTo(inputWrapper);
 		var passwordInput = $('<input/>').attr({ type: 'password',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
+	return inputWrapper;
+};
+
+const textAreaInput = function(element){
+	var element = element
+	var readOnly = element.readOnly ? 'readonly' : false;
+	var disabled = element.disabled ? 'disabled' : false;
+		var inputWrapper = $('<div/>', {class : 'mb-3'});
+		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
+		    label.appendTo(inputWrapper);
+		var passwordInput = $('<textarea/>').attr({class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
 	return inputWrapper;
 };
