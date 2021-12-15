@@ -734,6 +734,10 @@ const checkInputType = function(element){
 	  case 'form':
 		    // code block
 		    console.log("form");
+		    result=formInput(element);
+    	  	console.log("result: ");
+    	  	console.log(result);
+		    //formInput
 		    break;
 	  default:
 	    // code block
@@ -924,6 +928,40 @@ const numberInput = function(element){
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		label.appendTo(inputWrapper);
 		var numberInput = $('<input/>').attr({ type: 'number',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
+	    
+	return inputWrapper;
+}
+
+const formInput = function(element){
+	var element = element
+	var readOnly = element.readOnly ? 'readonly' : false;
+	var disabled = element.disabled ? 'disabled' : false;
+	
+	
+		var inputWrapper = $('<div/>', {class : 'mb-3'});
+		var fieldset =  $('<fieldset/>',{class:"border p-2"}).appendTo(inputWrapper);
+		var legend = $('<legend/>',{class:'float-none w-auto p-2'}).text(element.label).appendTo(fieldset);
+		//width:auto; margin-bottom: 0px; font-size: 12px; font-weight: bold; color: #1f497d;"
+		//.css({'width': 'auto','margin-bottom': '0px','font-size': '12px','font-weight': 'bold', 'color' : '#1f497d'})
+		//legend.css('width', 'auto');
+		//elements[3].jetFormWrapper.elements
+		console.log(`Printing the form elements`);
+		var formElement = element.jetFormWrapper.elements;
+		console.log(element.formClass);
+		//element.jetFormWrapper.elements
+	   $.each(formElement,function(e,v){
+		     		console.log(`before name change :: ${JSON.stringify(v.name)}`);
+		     		//var ee =$(this).attr('name',element.name.replace(".", ":")+'.'+$(this).attr('name'));
+		     		var ee =$(this).attr('name',element.id+'.'+$(this).attr('name'));
+		    		console.log(`after name change :: ${JSON.stringify(v.name)}`);
+		     		//formElement.push(ee);
+		});
+		
+		console.log(`changed name change :: ${JSON.stringify(element.jetFormWrapper.elements)}`);
+		createFormFields(formElement,fieldset);
+		//var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
+		//label.appendTo(inputWrapper);
+		//var numberInput = $('<input/>').attr({ type: 'number',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
 	    
 	return inputWrapper;
 }

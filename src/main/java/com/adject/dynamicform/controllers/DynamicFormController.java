@@ -190,8 +190,9 @@ public class DynamicFormController {
 		System.out.println("Multiple value map: ");
 		System.out.println(formData);
 		String className = formData.get("className").get(0).toString();
-		Object saveEntity = jetFormService.saveEntity(formData);
+		 Object saveEntity = jetFormService.saveEntity(formData);
 		System.out.println("formData : " + formData);
+		System.out.println("Printing the saved entity ::");
 		System.out.println(saveEntity);
 		model.addAttribute("className", className);
 		return "list";
