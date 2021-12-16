@@ -331,7 +331,7 @@ const formValidation = function(elements,form){
 					if(data == 'list'){
 						var className = $("[name='className']").val();
 						console.log("Printing the className : "+className);
-						//window.location.href = '/dynamic/list?className='+className;
+						window.location.href = '/dynamic/list?className='+className;
 					}	
 				},
 				error:function(data){

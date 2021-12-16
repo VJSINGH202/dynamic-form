@@ -46,7 +46,7 @@
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form:form>
 	</div>
-	<div class="container">
+	<!-- <div class="container">
 	  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
   <li class="nav-item" role="presentation">
     <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
@@ -63,7 +63,7 @@
   <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">profile-tab...</div>
   <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">contact-tab...</div>
 </div>
-	</div>
+	</div> -->
 <!-- <select class="form-select" multiple="multiple" aria-label="multiple select example">
   <option selected="selected">Open this select menu</option>
   <option value="1">One</option>
