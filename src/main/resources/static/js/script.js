@@ -946,18 +946,20 @@ const formInput = function(element){
 		//legend.css('width', 'auto');
 		//elements[3].jetFormWrapper.elements
 		console.log(`Printing the form elements`);
+		//var formElement = (element.jetFormWrapper) === 'undefined' ? element.formWrapper.elements : element.jetFormWrapper.elements;
 		var formElement = element.jetFormWrapper.elements;
 		console.log(element.formClass);
 		//element.jetFormWrapper.elements
 	   $.each(formElement,function(e,v){
 		     		console.log(`before name change :: ${JSON.stringify(v.name)}`);
 		     		//var ee =$(this).attr('name',element.name.replace(".", ":")+'.'+$(this).attr('name'));
-		     		var ee =$(this).attr('name',element.id+'.'+$(this).attr('name'));
+		     		var ee = $(this).attr('name',element.id+'.'+$(this).attr('name'));
 		    		console.log(`after name change :: ${JSON.stringify(v.name)}`);
 		     		//formElement.push(ee);
 		});
 		
 		console.log(`changed name change :: ${JSON.stringify(element.jetFormWrapper.elements)}`);
+		//console.log(`changed name change :: ${JSON.stringify(element.formWrapper.elements)}`)
 		createFormFields(formElement,fieldset);
 		//var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		//label.appendTo(inputWrapper);

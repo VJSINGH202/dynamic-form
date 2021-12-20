@@ -77,6 +77,7 @@ function getHeaderV2(){
 			 console.log("All elements:");
 			 console.log(data.elements)
 			 console.log("listable elements");
+			var filter = data.filter; 
 			var thead = $('<thead/>',{class:'bg-primary text-white'}).appendTo(table);
 			var tr = $('<tr/>').appendTo(thead);
 			var option=isSelectable(data);
@@ -103,7 +104,7 @@ function getHeaderV2(){
 				});
 				 $('<th/>').html("Action").appendTo(tr);
 				table.attr({id : 'data-table'});
-				getListV2(header,table,option);
+				getListV2(header,table,option,filter);
 				
 			//	row.append("</tr>");
 				$('#heading').text(data.name);
@@ -140,7 +141,7 @@ function checkAll(event){
 
 
 
-	function getListV2(header,table,option){
+	function getListV2(header,table,option,filter){
 		//console.log("name:"+className);	
 		
 		var table = table;
@@ -149,7 +150,8 @@ function checkAll(event){
 			url: 'entityList',
 			type: 'GET',
 			data:{
-				className:getclassName
+				className:getclassName,
+				filter:filter
 			},
 			success:function(data){
 				console.log("data of json")
@@ -181,6 +183,7 @@ function checkAll(event){
 									
 									if(checkDateType(v)){
 										tr.append("<td>"+convertDate(v)+"</td>");
+										//tr.append("<td>"+JSON.stringify(v)+"</td>");
 									}else{
 										
 										tr.append("<td>"+v+"</td>");

@@ -2,7 +2,9 @@ package com.adject.dynamicform.controllers;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -124,12 +126,20 @@ public class DynamicFormController {
 //	}
 
 	@GetMapping(value = "/entityList", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody String getList(@RequestParam("className") String className) {
+	public @ResponseBody List<?> getList(@RequestParam("className") String className,@RequestParam("filter") String filter) {
 		System.out.println("inside getlist function: " + className);
-		Gson gson = new Gson();
-		String json = gson.toJson(jetFormService.getList(className));
-		System.out.println("Json:" + json);
-		return json;
+		//Gson gson = new Gson();
+		
+		List<?> list = null;
+		Predicate<String> isBlank = s -> s.isBlank();
+		if(isBlank.test(filter)) {
+			 list = jetFormService.getList(className);
+		}else {
+			list = jetFormService.getFilteredList(className, filter);
+		}
+		//String json = gson.toJson(jetFormService.getList(className));
+		System.out.println("List:" + list);
+		return list;
 	}
 
 	@GetMapping(value = "/entity", produces = MediaType.APPLICATION_JSON_VALUE)
