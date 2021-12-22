@@ -873,6 +873,7 @@ const selectInput = function(element){
             }else{
             var seletedOption = $('<option/>', {selected : 'selected',disabled : 'disabled'}).text(element.placeHolder).appendTo(selectInput);
             }
+            
 		var options = [];
 		$.each(element.options, function (key, val) {
             const [value, labelText] = val.split(':');
@@ -881,16 +882,83 @@ const selectInput = function(element){
             }else{
                var option = $('<option/>', {value : value}).text(labelText);
             }
-       		options.push(option);
-    		});
+       		   options.push(option);
+    	});
+    		
 		if(Array.isArray(options)){
             $.each(options, function(key, val){
             	val.appendTo(selectInput);
             });
 		}
 		$(selectInput).chosen({width: "100%"});
+		
+		if(element.dependField !== ''){
+		     onChangedependableField(selectInput,element);
+		}
+		
 	return inputWrapper;
 }
+
+const onChangedependableField = function(selectInput,element){
+             console.log($(selectInput));
+             var selectInput = selectInput;
+         //  var selectInput = $(selectInput).empty();
+            var dependField = element.dependField;
+            console.log("element.dependedField ::: "+dependField);
+            var url = element.dataProvider.path
+            console.log("onChangedependableField register on ::  "+ dependField);
+     
+       $('#'+dependField).on('change',function(){
+             //var selectInput = $(selectInput);
+             var firstOption =  $(selectInput).find('option:eq(0)');
+                 $(selectInput).empty();
+             var data = $(this).val();
+             console.log('onChangedependableField call ::::: '+data);
+              $.ajax({
+			        url: url,
+			        type: "GET", 
+			        data: {'data' : data}, // data in json format timeout: 2000,	//Is useful ONLY if async=true. If async=false it is useless async: false, // enable or disable async (optional, but suggested as false if you need to populate data afterwards)
+			        success: function (data, textStatus, jqXHR) {
+			            console.log("success :: "+data);
+			            const optionsData = data.toString().split(',');
+			            console.log(optionsData);
+			            var options = [];
+			          
+			              console.log("First option");
+			              console.log(firstOption);
+			            options.push(firstOption);
+			            $.each(optionsData, function (key, val) {
+			            console.log('$.each(optionsData, function (key, val) {'+val);
+				           // const [value, labelText] = val.split(':');
+				            //if(value === element.value){
+				              // var option = $('<option/>', {value : value ,selected : 'selected'}).text(labelText);
+				            //}else{
+				               var option = $('<option/>', {value : val}).text(val);
+				            //}
+				       		   options.push(option);
+				    	});
+    		
+						if(Array.isArray(options)){
+						console.log('Array.isArray(options)');
+				            $.each(options, function(key, val){
+				            console.log('$.each(options, function(key, val){');
+				            
+				            	val.appendTo(selectInput);
+				            	console.log(selectInput)
+				            });
+						}
+						//$(selectInput).chosen({width: "100%"});
+						$(selectInput).trigger("chosen:updated");
+			        },
+			        error: function (jqXHR, textStatus, errorThrown) {
+			            console.log("jqXHR:" + jqXHR);
+			            console.log("TestStatus: " + textStatus);
+			            console.log("ErrorThrown: " + errorThrown);
+			        }
+			    });
+      });
+};
+
 const radioOrCheckInput = function(element,elementType){
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
@@ -898,7 +966,7 @@ const radioOrCheckInput = function(element,elementType){
 		
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
-		label.appendTo(inputWrapper);
+		    label.appendTo(inputWrapper);
 		var wrapper = [];
 		$.each(element.options, function (key, val) {
 			var radioWrapper = $('<div/>', {class : 'form-check form-check-inline'});

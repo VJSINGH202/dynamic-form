@@ -77,7 +77,17 @@ function getHeaderV2(){
 			 console.log("All elements:");
 			 console.log(data.elements)
 			 console.log("listable elements");
-			var filter = data.filter; 
+			var filter = (data.filter === undefined) ? '' : data.filter;
+			/* console.log("printing the data.filter"+data.filter);
+			if(data.filter === undefined){
+				console.log("inside is data.filter");
+				filter = "";
+			}else{
+				console.log("inside else data.filter");
+				filter = data.filter;
+			}
+			 */
+			console.log("printing the filter"+filter);
 			var thead = $('<thead/>',{class:'bg-primary text-white'}).appendTo(table);
 			var tr = $('<tr/>').appendTo(thead);
 			var option=isSelectable(data);

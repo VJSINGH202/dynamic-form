@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -128,10 +130,11 @@ public class DynamicFormController {
 	@GetMapping(value = "/entityList", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody List<?> getList(@RequestParam("className") String className,@RequestParam("filter") String filter) {
 		System.out.println("inside getlist function: " + className);
+		System.out.println("inside getlist function: " + filter);
 		//Gson gson = new Gson();
 		
 		List<?> list = null;
-		Predicate<String> isBlank = s -> s.isBlank();
+		Predicate<String> isBlank = s -> s.isEmpty();
 		if(isBlank.test(filter)) {
 			 list = jetFormService.getList(className);
 		}else {
@@ -207,6 +210,18 @@ public class DynamicFormController {
 		model.addAttribute("className", className);
 		return "list";
 		// return "index";
+	}
+	
+	@GetMapping("/data")
+	public @ResponseBody List<String> getData(@RequestParam String data){
+		System.out.println("printing the data :: "+data);
+		Map<String,List<String>> dataMap = new TreeMap<>();
+		    dataMap.put("MP", List.of("Indore","Jabalpur","Gwalior","Ujjain"));
+		    dataMap.put("UP", List.of("Ghaziabad","Noida","Meerut","Kanpur"));
+		    dataMap.put("UK", List.of("Dehradun","Haridwar","Roorkee","Rishikesh"));
+		    
+		    List<String> list = dataMap.get(data);
+		return list;
 	}
 	
 	@PostMapping(value="/uploadFile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
