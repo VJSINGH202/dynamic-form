@@ -13,23 +13,71 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Document List</title>
+<style type="text/css">
+.table>:not(caption)>*>* {
+    padding: 0.5rem 0.5rem;
+    /* background-color: var(--bs-table-bg); */
+    border-bottom-width: 0px;
+   /*  box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg); */
+}
+</style>
 </head>
 <body>
+<!-- <div class="container">
+     <div class="row">
+        <div class="col-10">
+          <span id="form-class-name"></span>
+        </div>
+        <div class="col-2">
+           <button type="button" id="form-link" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#jet-form-modal"></button>
+        </div>
+     </div>
+     <div id="jet-table" class="card p-3"></div>
+</div> -->
 
-<div class="container  bg-light px-0">
+<div class="container bg-light px-0">
 	<div class="row my-3 py-2">
 		<div class="col-md-10">
-			<h2 id="heading"></h2>
+			<h2 id="form-class-name"></h2>
 		</div>
 		<div class="col-md-2">
-			<a id="form-link" class="btn btn-primary d-block" href='${formLink}'></a>
+			<%-- <a id="form-link" class="btn btn-primary d-block" href='${formLink}'></a> --%>
+			<button type="button" id="form-link" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#jet-form-modal"></button>
+			<!-- jet-form-modal -->
 		</div>
 	</div>
 	<div id="jet-table" class="card p-3">
 	
 	</div>
 </div>
-<script type="text/javascript"></script>
+
+<!-- Modal -->
+<div class="modal fade" id="jet-form-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div> -->
+      <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      <div class="modal-body p-0" id="jet-form">
+         
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+<!-- <script type="text/javascript" src="/js/moment.js"></script>
+<script type="text/javascript" src="/js/jquery-ui.js"></script>
+<script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/date.js"></script>
+<script type="text/javascript" src="/js/time.js"></script>
+<script type="text/javascript" src="/js/chosen.jquery.js"></script>
+<script type="text/javascript" src="/js/prism.js"></script>
+<script type="text/javascript" src="/js/init.js"></script>
+<script type="text/javascript" src="/js/script.js"></script> -->
 <script>
 $(document).ready(function(){
 	// $('#data-table').DataTable();	
@@ -48,14 +96,22 @@ $(document).ready(function(){
 		    //"searching": true, 
 		  });
 	*/
-	
+	onModelClose();
 	
 	
 });
 
+function onModelClose(){
+	$(document).on('click','.model-close',function(){
+		console.log(":::::::::::::: on #modal-content .btn-close ::::::::");
+		$('#jet-form').empty();
+	});
+}
+
 function createTable(){
 	
-	var table = $('<table>').attr({class : 'table'}).appendTo('#jet-table');
+	var table = $('<table>').attr({class : 'table table-hover'}).appendTo('#jet-table');
+	   //$('<caption/>').appendTo(table);
 	return table;
 }
 
@@ -117,7 +173,7 @@ function getHeaderV2(){
 				getListV2(header,table,option,filter);
 				
 			//	row.append("</tr>");
-				$('#heading').text(data.name);
+				$('#form-class-name').text(data.name);
 				$('#form-link').text("+ Add "+data.name);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
@@ -191,7 +247,7 @@ function checkAll(event){
 								if(val == k){
 									console.log(k);	
 									
-									if(checkDateType(v)){
+									if(isDateType(v)){
 										tr.append("<td>"+convertDate(v)+"</td>");
 										//tr.append("<td>"+JSON.stringify(v)+"</td>");
 									}else{
@@ -200,7 +256,7 @@ function checkAll(event){
 									}
 									
 									console.log("Printing : "+typeof v);
-									checkDateType(v);
+									isDateType(v);
 								}
 							});							
 					});
@@ -261,14 +317,14 @@ function checkAll(event){
 		});
 	}
 	
-	const checkDateType = function(date){
+	const isDateType = function(date){
 		if(typeof date === 'object'){
 			console.log('inside');
 			return true;
 		}
 	};
 	
-  const formatDate = function(date) {
+  const formatDateUI = function(date) {
 	 
 		var javadateTime = new Date(date);
 		var day = ("0" + javadateTime.getDate()).slice(-2);
@@ -285,7 +341,7 @@ function checkAll(event){
 		var year = date.year;
 
 		var date = new Date(Date.UTC(year, month, day));
-		 date  = formatDate(date);
+		 date  = formatDateUI(date);
 		console.log('inside convertDate');
 		console.log(date); // "2016-11-15T00:00:00.000Z"
 		return date;

@@ -2,9 +2,15 @@ $(document).ready(function() {
 
     console.log("inside external")
     var className;
-    getClassName();
-    
+//    getClassName();
+    $('#form-link').on('click',function(){
+     console.log('form-link click :: ');
+     getClassName();
+     });
 });
+
+
+
 
 const getClassName = function(){
    
@@ -79,7 +85,7 @@ const form = function(form,className){
 	var elements = form.elements;
 	var action = getFormAction(form.actions);
 	
-	var card = $('<div/>',{class:'card'}).appendTo('#jetForm');
+	var card = $('<div/>',{class:'card'}).appendTo('#jet-form');
 	var cardHeader = $('<div/>',{class:'card-header text-white bg-primary'}).appendTo(card);
 	      createCardHeader(className,form.title).appendTo(cardHeader);
 	    //createCardHeader.appendTo(cardHeader);
@@ -535,9 +541,12 @@ console.log(validation.type.toLowerCase());
 
 const createCardHeader = function(className,title){
      var row = $('<div/>',{class:'row'});  
-      $('<div/>',{class:'col-9'}).text(title).appendTo(row);
-     var col = $('<div/>',{class:'col-3'}).appendTo(row);
-      $('<a/>',{class : 'btn btn-outline-light btn-sm d-block',href : '/dynamic/list?className='+className}).text('<- Back').appendTo(col);
+      $('<div/>',{class:'col-11'}).text(title).appendTo(row);
+     var col = $('<div/>',{class:'col-1'}).appendTo(row);
+      //$('<a/>',{class : 'btn btn-outline-light btn-sm d-block',href : '/dynamic/list?className='+className}).text('<- Back').appendTo(col);
+      // <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+     var closeButton = $('<a/>',{href:'#',class:'model-close text-white text-decoration-none'}).appendTo(col);
+         closeButton.attr({'data-bs-dismiss':'modal','aria-label':'Close'}).html('&times;').text();
    return row;
 }
 
@@ -884,20 +893,112 @@ const selectInput = function(element){
             }
        		   options.push(option);
     	});
+    	console.log("Printing the element.dependentFields ::::: "+element.dependentFields);
+    	$.each(element.dependentFields, function (key, val) {
+            const {child, datapath,type} = val;
+            console.log(`child : ${child} | datapath : ${datapath} | type : ${type}`);
+    	});
     		
 		if(Array.isArray(options)){
             $.each(options, function(key, val){
             	val.appendTo(selectInput);
             });
 		}
-		$(selectInput).chosen({width: "100%"});
 		
-		if(element.dependField !== ''){
+		$(selectInput).chosen({width: "100%"});
+		/*
+		   
+		   if(element.dependField !== ''){
 		     onChangedependableField(selectInput,element);
+		}*/
+		if(element.dependentFields !== undefined && element.dependentFields.length !== 0 ){
+		console.log(`:::::::::::::::::::::  onParentChange(element,selectInput); :::::::::::::::::::::::`);
+		       onParentChange(element,selectInput);
 		}
 		
 	return inputWrapper;
 }
+
+
+
+const onParentChange = function(element,selectInput){
+
+       console.log("onParentChange register on ::  "+ element.name);
+       var dependentFields = element.dependentFields;
+       var selectInput = selectInput;
+        $(selectInput).on('change',function(){
+        console.log("Inside onParentChange onchange function :: ");
+           var selectInputValue = $(this).val();
+              console.log(`Printing the selectInputValue ::: ${selectInputValue}`);     
+              console.log(`Printing the dependentFields ${dependentFields}`);  
+              $.each(dependentFields,function(key,value){
+                         const {child, datapath, type} = value;
+                         console.log(`child : ${child} | datapath : ${datapath} | type : ${type}`);
+                         renderChilds(value,selectInputValue);
+              });
+       });
+                         
+};
+
+const renderChilds = function(value,selectInputValue){
+console.log(`:::::::::::::::::::renderChilds ::::::::::::::`);
+    const {child, datapath, type} = value;
+    
+    if(type === 'load'){
+       console.log($('#'+child));
+             var firstOption =  $('#'+child).find('option:eq(0)');
+              $('#'+child).empty();
+             console.log(`Printing the firstOption ::::::::::`);
+             console.log(firstOption);
+             $.ajax({
+			        url: datapath,
+			        type: "GET", 
+			        data: {'data' : selectInputValue}, 
+			        success: function (data, textStatus, jqXHR) {
+			            console.log("success :: "+data);
+			             const optionsData = data.toString().split(',');
+			            console.log(optionsData);
+			            var options = [];
+			          
+			              console.log("First option");
+			              console.log(firstOption);
+			            options.push(firstOption);
+			            $.each(optionsData, function (key, val) {
+			            console.log('$.each(optionsData, function (key, val) {'+val);
+				               var option = $('<option/>', {value : val}).text(val);
+				       		   options.push(option);
+				    	});
+    		
+						if(Array.isArray(options)){
+						console.log('Array.isArray(options)');
+				            $.each(options, function(key, val){
+				            console.log('$.each(options, function(key, val){');
+				            	val.appendTo('#'+child);
+				            	//console.log(selectInput)
+				            });
+						}
+						//$(selectInput).chosen({width: "100%"});
+						$('#'+child).trigger("chosen:updated");
+			        },
+			        error: function (jqXHR, textStatus, errorThrown) {
+			            console.log("jqXHR:" + jqXHR);
+			            console.log("TestStatus: " + textStatus);
+			            console.log("ErrorThrown: " + errorThrown);
+			        }
+			    });
+    }else{
+             console.log(`::::::::::::::::::: Inside Hidden else Block :::::::::::::::::`);
+             if(selectInputValue === datapath){
+             console.log(`::::::::::::::::::: selectInputValue : ${selectInputValue} |  datapath : ${datapath} :::::::::::::::::`);
+             console.log(`::::: hide element ::::::::`);
+             console.log($('#'+child).parent());
+               $('#'+child).parent().hide();
+             }else{
+               $('#'+child).parent().show();
+             }
+    }
+             
+};
 
 const onChangedependableField = function(selectInput,element){
              console.log($(selectInput));
@@ -967,26 +1068,74 @@ const radioOrCheckInput = function(element,elementType){
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
 		    label.appendTo(inputWrapper);
+		
 		var wrapper = [];
+		
+		var radioInput = [];
+		
 		$.each(element.options, function (key, val) {
 			var radioWrapper = $('<div/>', {class : 'form-check form-check-inline'});
             const [value, labelText] = val.split(':');
             var radioLabel = $('<label/>', {for : element.id ,class : 'form-check-label'}).text(labelText);
             radioLabel.appendTo(radioWrapper);
+            var radio;
             if(value === element.value){
-               $('<input/>').attr({ type: elementType,class:'form-check-input' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled ,checked : 'checked'}).appendTo(radioWrapper);
+               radio =  $('<input/>').attr({ type: elementType,class:'form-check-input jet-'+element.name , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled ,checked : 'checked'}).appendTo(radioWrapper);
             }else{
-       		   $('<input/>').attr({ type: elementType,class:'form-check-input' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled}).appendTo(radioWrapper);
+       	       radio = $('<input/>').attr({ type: elementType,class:'form-check-input jet-'+element.name , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled}).appendTo(radioWrapper);
        		}
+       		radioInput.push(radio);
        		wrapper.push(radioWrapper);
     		});
+    		
 		if(Array.isArray(wrapper)){
             $.each(wrapper, function(key, val){
             	val.appendTo(inputWrapper);
             });
 		}
+		
+		if(element.dependentFields !== undefined && element.dependentFields.length !== 0 ){
+		console.log(`:::::::::::::::::::::  onParentChange(element,radioInput); :::::::::::::::::::::::`);
+			 if(Array.isArray(radioInput)){
+	            $.each(radioInput, function(key, radioInput){
+	            	 onParentRadioChange(element,radioInput);
+	            });
+			}
+		      // onParentRadioChange(element,radioInput);
+		}
+		
 	return inputWrapper;
 }
+
+const onParentRadioChange = function(element,radioInput){
+    
+       console.log("onParentChange register on ::  "+ element.name);
+       console.log(`:::::  Printing radiowrapper  ::::`);
+       console.log(radioInput);
+      var dependentFields = element.dependentFields;
+       var radioInput = radioInput;
+        $(radioInput).on('click',function(){
+        console.log("Inside onParentChange onchange function :: ");
+           var selectInputValue = $(this).val();
+                     //  if($(this).is(':checked')){
+                       console.log(`Printing the selectInputValue ::: ${selectInputValue}`);     
+                       console.log(`Printing the dependentFields ${dependentFields}`);  
+			              $.each(dependentFields,function(key,value){
+			                         const {child, datapath, type} = value;
+			                         console.log(`child : ${child} | datapath : ${datapath} | type : ${type}`);
+			                         renderChilds(value,selectInputValue);
+			              });
+                       //}
+              /*console.log(`Printing the selectInputValue ::: ${selectInputValue}`);     
+              console.log(`Printing the dependentFields ${dependentFields}`);  
+              $.each(dependentFields,function(key,value){
+                         const {child, datapath, type} = value;
+                         console.log(`child : ${child} | datapath : ${datapath} | type : ${type}`);
+                         renderChilds(value,selectInputValue);
+              });*/
+       });
+                         
+};
 
 const numberInput = function(element){
 	var element = element

@@ -41,6 +41,13 @@
 		crossorigin="anonymous"></script>
     <script type="text/javascript" src="/js/moment.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/date.js"></script>
+<script type="text/javascript" src="/js/time.js"></script>
+<script type="text/javascript" src="/js/chosen.jquery.js"></script>
+<script type="text/javascript" src="/js/prism.js"></script>
+<script type="text/javascript" src="/js/init.js"></script>
+<script type="text/javascript" src="/js/script.js"></script>
 		
 <!-- 	<script>
 $(document).ready(function() {
