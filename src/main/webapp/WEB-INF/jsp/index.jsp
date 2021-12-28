@@ -41,6 +41,7 @@
 				    <option value="io.jetform.core.entity.Employee">Employee</option>
 					<option value="io.jetform.core.entity.People">People</option>
 					<option value="io.jetform.core.entity.Contact">Contact</option>
+					<option value="io.jetform.core.entity.Customer">Customer</option>					
 			    </form:select>
 			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
