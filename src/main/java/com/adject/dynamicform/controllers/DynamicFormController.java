@@ -277,8 +277,8 @@ public class DynamicFormController {
 	@GetMapping(value = "/delete")
 	public @ResponseBody String deleteEntity(@RequestParam("id") Long id, @RequestParam("className") String className) {
 
-		//boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
-		boolean status =true;
+		boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
+		//boolean status =true;
 		return status ? "Deleted" : "Something went wrong";
 	}
 
