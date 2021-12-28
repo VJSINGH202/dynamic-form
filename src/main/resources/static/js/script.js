@@ -4,8 +4,8 @@ $(document).ready(function() {
     var className;
 //    getClassName();
     $('#form-link').on('click',function(){
-     console.log('form-link click :: ');
-     getClassName();
+        console.log('form-link click :: ');
+        getClassName();
      });
 });
 
@@ -741,6 +741,12 @@ const checkInputType = function(element){
     	  	console.log("result: ");
     	  	console.log(result);
     	  	break;
+      case 'custom_field':
+    	  	console.log('element is textarea type');
+    	  	result = customFieldInput(element);
+    	  	console.log("result: ");
+    	  	console.log(result);
+    	  	break;
 	  case 'form':
 		    // code block
 		    console.log("form");
@@ -1298,6 +1304,26 @@ const formatDate = function(dateInput,format){
 		    console.log(moment(this.value,'yyyy-mm-dd'));
 		    console.log(moment(this.value).format(format));
 		});//.trigger("change")
+};
+
+const customFieldInput = function(element){
+	var element = element
+	var readOnly = element.readOnly ? 'readonly' : false;
+	var disabled = element.disabled ? 'disabled' : false;
+		var inputWrapper = $('<div/>', {class : 'mb-3'});
+		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
+		    label.appendTo(inputWrapper);
+		 console.log(element.filePath);
+		    $.get(element.filePath)
+	    	     .done(function(data) {
+		    		 console.log('Success :-) '+data)
+		    	     $('<div/>').html(data).appendTo(inputWrapper);})
+	    		  .fail(function(data){
+	    		     console.log('Error :-( ')
+	    		     console.log(data);});
+		
+		//var passwordInput = $('<textarea/>').attr({class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
+	return inputWrapper;
 };
 
 const emailInput = function(element){

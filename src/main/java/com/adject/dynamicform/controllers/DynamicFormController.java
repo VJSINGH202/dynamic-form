@@ -228,6 +228,15 @@ public class DynamicFormController {
 		return list;
 	}
 	
+	@GetMapping("/section")
+	public @ResponseBody List<String> getSection(@RequestParam String data){
+		System.out.println("printing the data :: "+data);
+		Map<String,List<String>> dataMap = new TreeMap<>();
+		    dataMap.put("Section", List.of("Section-A","Section-B","Section-C","Section-D")); 
+		    List<String> list = dataMap.get(data);
+		return list;
+	}
+	
 	@PostMapping(value="/uploadFile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
 	public String saveFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("uploadPath") String uploadPath) throws IOException {
