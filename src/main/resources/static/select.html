@@ -1,0 +1,26 @@
+     <select id="select">
+     </select>
+     <script type="text/javascript">
+     $(document).ready(function(){
+    	 getData();
+     });
+     
+     function getData(){
+    	 $.ajax({
+    			type:'GET',
+    			url:'dynamic/data',
+    			data: {'data' : 'MP'},
+    			success:function(data){
+    				console.log("printing the data :::: ")
+    				console.log(data);
+    				$.each(data,function(key,val){
+    					$('<option/>').text(val).appendTo('#select');
+    				});
+    			},
+    			error:function(data){
+    				console.log(data)
+    			}
+    			
+    		});
+     }
+     </script>

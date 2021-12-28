@@ -69,6 +69,28 @@
     </div>
   </div>
 </div>
+
+<!-- delete model -->
+<!-- Modal -->
+<div class="modal fade" id="jet-form-delete-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <p>Are you sure you want to delete?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" id="model-delete">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- <script type="text/javascript" src="/js/moment.js"></script>
 <script type="text/javascript" src="/js/jquery-ui.js"></script>
 <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
@@ -97,15 +119,23 @@ $(document).ready(function(){
 		  });
 	*/
 	onModelClose();
-	
+	//hide.bs.modal
 	
 });
 
 function onModelClose(){
+	$(".model-close").off("click");
 	$(document).on('click','.model-close',function(){
 		console.log(":::::::::::::: on #modal-content .btn-close ::::::::");
 		$('#jet-form').empty();
 	});
+	
+	$("#jet-form-modal").off("hide.bs.modal");
+	$(document).on('hide.bs.modal','#jet-form-modal',function(){
+		console.log(":::::::::::::: on #modal-content .btn-close hide.bs.modal ::::::::");
+		$('#jet-form').empty();
+	});
+	
 }
 
 function createTable(){
@@ -239,7 +269,7 @@ function checkAll(event){
 					}
 					else{
 						var td=$('<td/>').appendTo(tr);
-						$('<input/>').attr({type:'checkbox',class:'checkSingle ml-2',value:value.id,onclick:'checkdelete(event)'}).appendTo(td);
+						$('<input/>').attr({type:'checkbox',class:'checkSingle m-1',value:value.id,onclick:'checkdelete(event)'}).appendTo(td);
 					}
 					$.each(value,function(k,v){
 //					console.log("each attribute of row: "+ k)
@@ -260,8 +290,9 @@ function checkAll(event){
 								}
 							});							
 					});
-//					tr.append("<td><a class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
-					tr.append("<td><a class='btn btn-md text-success' href='${contextPath}/dynamic/generate?id="+value.id+"&className="+getclassName+"' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='#' onclick=deleteEntity('"+value.id+"','"+getclassName+"',event) class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a><a class='btn btn-md text-primary' href='${contextPath}/dynamic/view?id="+value.id+"&className="+getclassName+"' data-toggle='tooltip' data-placement='top' title='View'><i class='fal fa-eye'></i></a></td>");
+				//	tr.append("<td><a class='btn btn-md text-success' data-toggle='tooltip' data-placement='top' title='Edit' onclick=update('"+ value.id+"','"+className+"')><i class='fal fa-edit'></i></a> <button  class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></button></td>");
+				//  href='${contextPath}/dynamic/generate?id="+value.id+"&className="+getclassName+"'
+				    tr.append("<td><a class='btn btn-md text-success' onclick=updateEntity('"+ value.id+"','"+getclassName+"') data-toggle='tooltip' data-placement='top' title='Edit'><i class='fal fa-edit'></i></a> <a href='#' onclick=deleteEntity('"+value.id+"','"+getclassName+"',event) class='btn btn-md text-danger' data-toggle='tooltip' data-placement='top' title='Delete'><i class='fal fa-trash-alt'></i></a><a class='btn btn-md text-primary' href='${contextPath}/dynamic/view?id="+value.id+"&className="+getclassName+"' data-toggle='tooltip' data-placement='top' title='View'><i class='fal fa-eye'></i></a></td>");
 					tr.appendTo(tbody);				
 				});
 				
@@ -273,6 +304,16 @@ function checkAll(event){
 			}
 			
 		});
+	}
+	
+	function updateEntity(id,classname){
+		console.log('updateEntity'+id+' '+classname);
+		var myModal = new bootstrap.Modal($('#jet-form-modal'), {
+			  keyboard: false
+		});
+		 myModal.show();
+		 getUpdateForm(id,classname);
+		 onModelClose();
 	}
 	
 	function deleteMultiple(event){
@@ -403,32 +444,52 @@ function checkAll(event){
 	 	error:function(data){
 	 		console.log(data); 
 	 	}
-	 }) 
+	 });
  }
 	
  function deleteEntity(id,className,event){
 	 console.log(id);
 	// console.log(className);
+	var myModal = new bootstrap.Modal($('#jet-form-delete-modal'), {
+		  keyboard: false
+	});
+	 myModal.show();
+	 console.log(myModal._element);
+	 var modelDelete = $('#model-delete').attr('data',id);
+	
 	 var table=$('#data-table').DataTable();
 	 console.log("event object: ");
      console.log(event);
 	 var tableRow = $(event.target).parent().parent().parent();
-	 $.ajax({
-		 url:'delete',
-		 type:'GET',
-		 data:{
-			 id:id,
-			 className:getclassName
-		 },
-		 success:function(data){
-			console.log(data);
-		
-			table.row(tableRow).remove().draw();
-		 },
-	 	error:function(data){
-	 		console.log(data);
-	 	}
-	 });
+	 
+	 console.log('printing the table-row -> ');
+	 console.log(tableRow)
+	 $('#model-delete').unbind("click").bind("click",function(){
+		 var data = $('#model-delete').attr('data');
+		   console.log('printing the data ::: '+data);
+	      if(data !== undefined && data !==null && data !== ''){
+	    	//  table.row(tableRow).remove().draw();
+	    	   $.ajax({
+		 		 url:'delete',
+		 		 type:'GET',
+		 		 data:{
+		 			 id:id,
+		 			 className:getclassName
+		 		 },
+		 		 success:function(data){
+		 			console.log(data);
+		 			myModal.hide();
+		 			modelDelete.removeAttr("data");
+		 			console.log(tableRow);
+		 			table.row(tableRow).remove().draw();
+		 		 },
+		 	 	error:function(data){
+		 	 		console.log(data);
+		 	 	}
+	 	    });
+	      }
+       });
+	
  }
 /* function getList(className,header){
 		console.log(className);		

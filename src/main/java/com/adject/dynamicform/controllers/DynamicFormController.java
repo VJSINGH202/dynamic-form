@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.adject.dynamicform.modal.DynamicForm;
 import com.adject.dynamicform.model.UploadFileDto;
@@ -103,17 +104,20 @@ public class DynamicFormController {
 		return "form";
 	}
 
-	@PostMapping("/list")
-	public String getList(@ModelAttribute DynamicForm dynamicForm, Model model) {
+	@GetMapping("/list")
+	public String getList(@ModelAttribute DynamicForm dynamicForm, Model model,RedirectAttributes attributes) {
 		model.addAttribute("className", dynamicForm.getClassName());
+		attributes.addAttribute("className",dynamicForm.getClassName());
+		System.out.println("inside list :"+dynamicForm.getClassName());
 		return "list";
 	}
 
-	@GetMapping("/list")
-	public String getList(@RequestParam String className, Model model) {
-		model.addAttribute("className", className);
-		return "list";
-	}
+	/*
+	 * @GetMapping("/list") public String getList(@RequestParam String className,
+	 * Model model,RedirectAttributes attributes) { model.addAttribute("className",
+	 * className); attributes.addAttribute("className",className);
+	 * System.out.println("inside list :"+className); return "list"; }
+	 */
 
 //	@GetMapping(value = "/load", produces = MediaType.APPLICATION_JSON_VALUE)
 //	public @ResponseBody String loadJson(@RequestParam("className") String className) {
@@ -264,7 +268,8 @@ public class DynamicFormController {
 	@GetMapping(value = "/delete")
 	public @ResponseBody String deleteEntity(@RequestParam("id") Long id, @RequestParam("className") String className) {
 
-		boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
+		//boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
+		boolean status =true;
 		return status ? "Deleted" : "Something went wrong";
 	}
 

@@ -34,7 +34,7 @@
 		</div>
 	</nav>
 	<div class="container mt-5 mx-auto">
-		<form:form action="dynamic/list" modelAttribute="dynamicForm" method="POST">
+		<form:form action="dynamic/list" modelAttribute="dynamicForm" method="Get">
 			<div class="mb-3">
 				<form:select class="form-select" aria-label="Default select example" path="className">
 				    <option disabled="disabled">Choose a ClassName</option>
@@ -46,34 +46,46 @@
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form:form>
 	</div>
-	<!-- <div class="container">
-	  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</button>
-  </li>
-</ul>
-<div class="tab-content" id="pills-tabContent">
-  <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">home-tab...</div>
-  <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">profile-tab...</div>
-  <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">contact-tab...</div>
-</div>
-	</div> -->
-<!-- <select class="form-select" multiple="multiple" aria-label="multiple select example">
-  <option selected="selected">Open this select menu</option>
-  <option value="1">One</option>
-  <option value="2">Two</option>
-  <option value="3">Three</option>
-</select> -->
-	<!-- Option 1: Bootstrap Bundle with Popper -->
+	<hr/>
+	<div class="container">
+	   <div id="result">
+	   </div> 
+	</div>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+		crossorigin="anonymous"></script>
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
 		crossorigin="anonymous"></script>
+	
+	<script type="text/javascript">
+	    $(document).ready(function(){
+	    	console.log("ready :-) ");
+	    	/* $.get('select.html',function(data){
+	    				console.log(data);
+	    				$('#result').html(data);
+	    			}
+	    			
+	    		  ); */
+	    	
+	    	$.get('select.html')
+	    	 .done(function(data) {
+	    		 console.log('Success :-) '+data)
+	    	 	/* var div = $('<div/>').html(data).appendTo('body');
+	    		  console.log(div);
+	    		  console.log(div.outerHTML);
+	    		  var dataHtml = div.outerHTML;
+	    		   div.remove();
+	    		   $('#result').html(dataHtml); */
+	    	     $('#result').html(data);
+	    		 
+	    		  }
+	    	 ).fail(function(data){
+	    		 console.log('Error :-( ')
+	    		 console.log(data);
+	    	 });
+	    });	
+	</script>
 </body>
 </html>
