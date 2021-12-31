@@ -1,0 +1,27 @@
+     <select id="select" class="form-select" name="section" aria-label="Default select example">
+      <option selected>Choose a options</option>
+     </select>
+     <script type="text/javascript">
+     $(document).ready(function(){
+    	 getData();
+     });
+     
+     function getData(){
+    	 $.ajax({
+    			type:'GET',
+    			url:'/dynamic/section',
+    			data: {'data' : 'Section'},
+    			success:function(data){
+    				console.log("printing the data :::: ")
+    				console.log(data);
+    				$.each(data,function(key,val){
+    					$('<option/>',{value:val}).text(val).appendTo('#select');
+    				});
+    			},
+    			error:function(data){
+    				console.log(data)
+    			}
+    			
+    		});
+     }
+     </script>

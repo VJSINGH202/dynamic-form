@@ -1156,40 +1156,113 @@ const numberInput = function(element){
 	return inputWrapper;
 }
 
+const createOneToManyFormFields = function(elements,tBodyRow){
+	
+	console.log("Printing the elements : ");
+	console.log(typeof form);
+	console.log(elements);
+	
+	$.each(elements, function (key, val) {
+         console.log("OneToManyFormFields each value: ");
+         console.log(val);
+         if(val.fieldType === 'HIDDEN'){
+             var result = checkInputType(val);
+	             result.appendTo(tBodyRow);
+         }else if(val.fieldType === 'FORM'){
+              
+         }else{
+	         var result = checkInputType(val);
+	         var td = $('<td/>').appendTo(tBodyRow)
+	                result.appendTo(td);
+         }
+    });
+	
+}
+
 const formInput = function(element){
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
 	var disabled = element.disabled ? 'disabled' : false;
 	
-	
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
-		var fieldset =  $('<fieldset/>',{class:"border p-2"}).appendTo(inputWrapper);
-		var legend = $('<legend/>',{class:'float-none w-auto p-2'}).text(element.label).appendTo(fieldset);
-		//width:auto; margin-bottom: 0px; font-size: 12px; font-weight: bold; color: #1f497d;"
-		//.css({'width': 'auto','margin-bottom': '0px','font-size': '12px','font-weight': 'bold', 'color' : '#1f497d'})
-		//legend.css('width', 'auto');
-		//elements[3].jetFormWrapper.elements
-		console.log(`Printing the form elements`);
-		//var formElement = (element.jetFormWrapper) === 'undefined' ? element.formWrapper.elements : element.jetFormWrapper.elements;
-		var formElement = element.jetFormWrapper.elements;
-		console.log(element.formClass);
-		//element.jetFormWrapper.elements
-	   $.each(formElement,function(e,v){
-		     		console.log(`before name change :: ${JSON.stringify(v.name)}`);
-		     		//var ee =$(this).attr('name',element.name.replace(".", ":")+'.'+$(this).attr('name'));
-		     		var ee = $(this).attr('name',element.id+'.'+$(this).attr('name'));
-		    		console.log(`after name change :: ${JSON.stringify(v.name)}`);
-		     		//formElement.push(ee);
-		});
 		
-		console.log(`changed name change :: ${JSON.stringify(element.jetFormWrapper.elements)}`);
-		//console.log(`changed name change :: ${JSON.stringify(element.formWrapper.elements)}`)
-		createFormFields(formElement,fieldset);
-		//var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
-		//label.appendTo(inputWrapper);
-		//var numberInput = $('<input/>').attr({ type: 'number',class:'form-control' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled}).appendTo(inputWrapper);
-	    
+		if(element.relation === 'ONE_TO_MANY'){
+		     console.log(':::: Rendering the ONE_TO_MANY ::::');
+		     var table = $('<table/>',{class:'table table-bordered'}).appendTo(inputWrapper);
+		     var formElement = element.jetFormWrapper.elements;
+		     var tHead = $('<thead/>').appendTo(table);
+		     var tHeadRow = $('<tr/>').appendTo(tHead);
+		     const filterElement = formElement.filter(e => { return e.fieldType !== 'HIDDEN' && e.fieldType !== 'FORM' });
+		     $.each(filterElement,function(e,v){
+		                console.log(`:::::::::: printing the table headers :::::`);
+			     		console.log(v.label);
+			     		$('<th/>').text(v.label).appendTo(tHeadRow);
+			 });
+			 
+			 var tBody = $('<tbody/>').appendTo(table);
+			 var tBodyRow = $('<tr/>').appendTo(tBody);
+			 createOneToManyFormFields(formElement,tBodyRow);
+			 var allLabel = $(tBodyRow).find('label');
+			 console.log(':::: printing the label  :::::::');
+			 console.log(allLabel);
+			 $.each(allLabel,function(e,v){
+			     console.log(`Removing element`);
+			      v.remove();
+			 });
+			 
+			  var addRow = $('<button/>',{class:'btn btn-sm btn-outline-primary',type:'button'}).html('<i class="fa fa-plus"></i>');
+			  var deleteRow = $('<button/>',{class:'btn btn-sm btn-outline-danger',type:'button'}).html('<i class="fa fa-minus"></i>');
+			 
+			 $(table).before(addRow);
+			 $(table).before(deleteRow);
+			 addRowOnclick(addRow,table);
+			 deleteRowOnclick(deleteRow,table);
+		} else {
+		     console.log(':::: Rendering the ONE_TO_ONE ::::');
+			var fieldset =  $('<fieldset/>',{class:"border p-2"}).appendTo(inputWrapper);
+			var legend = $('<legend/>',{class:'float-none w-auto p-2'}).text(element.label).appendTo(fieldset);
+		
+			console.log(`Printing the form elements`);
+			var formElement = element.jetFormWrapper.elements;
+			console.log(element.formClass);
+			//element.jetFormWrapper.elements
+		   $.each(formElement,function(e,v){
+			     		console.log(`before name change :: ${JSON.stringify(v.name)}`);
+			     		var ee = $(this).attr('name',element.id+'.'+$(this).attr('name'));
+			    		console.log(`after name change :: ${JSON.stringify(v.name)}`);
+			});
+			console.log(`changed name change :: ${JSON.stringify(element.jetFormWrapper.elements)}`);
+			createFormFields(formElement,fieldset);
+		}
+
 	return inputWrapper;
+}
+
+const addRowOnclick = function(addRowButton,table){
+   $(addRowButton).on('click',function(){
+      console.log('::: addRowButton click::: ');
+      var tr = $(table).find('tbody tr:first');
+      console.log('printing the table row');
+      console.log(tr);
+      console.log(tr[0].outerHTML);//[0]   [0].outerHTML
+      var firstRow = tr[0].outerHTML;
+      $(table).find('tbody tr:last').after(`${firstRow}`);
+    });
+}
+
+const deleteRowOnclick = function(deleteRowButton,table){
+   $(deleteRowButton).on('click',function(){
+      console.log('::: deleteRowButton click::: ');
+      var tr = $(table).find('tbody tr');
+      console.log('printing the rows ');
+      console.log(tr);
+      const rowLenght = $(tr).length;
+      console.log(rowLenght);
+      if(rowLenght > 1){
+          var lastRow = $(table).find('tbody tr:last');
+          lastRow.remove();
+      }
+    });
 }
 
 const fileInput = function(element,accept){
@@ -1314,8 +1387,9 @@ const customFieldInput = function(element){
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		    label.appendTo(inputWrapper);
 		 console.log(element.filePath);
-		    $.get(element.filePath)
-	    	     .done(function(data) {
+		   // $.get(element.filePath)
+		    $.get('resource',{ fileName: element.filePath})
+	    	      .done(function(data) {
 		    		 console.log('Success :-) '+data)
 		    	     $('<div/>').html(data).appendTo(inputWrapper);})
 	    		  .fail(function(data){

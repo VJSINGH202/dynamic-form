@@ -1,25 +1,31 @@
 package com.adject.dynamicform.controllers;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,17 +34,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.adject.dynamicform.modal.DynamicForm;
-import com.adject.dynamicform.model.UploadFileDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
-import io.jetform.core.annotation.model.FormElementWrapper;
 import io.jetform.core.annotation.model.JetFormWrapper;
 import io.jetform.core.engine.helper.FormRenderer;
 import io.jetform.core.entity.DocumentMedia;
-import io.jetform.core.entity.Employee;
-import io.jetform.core.repository.DocumentMediaRepo;
 import io.jetform.core.service.JetFormService;
 
 @Controller
@@ -50,8 +50,12 @@ public class DynamicFormController {
 	@Autowired
 	private FormRenderer formRenderer;
 	
-	
+	@Autowired
+	ResourceLoader resourceLoader;
 
+	@Autowired
+	ServletContext servletContext;
+	
 //	@PostMapping("/generate")
 //	public String generateForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
 //
@@ -73,7 +77,6 @@ public class DynamicFormController {
 //		return "home";
 //	}
 
-	
 	// Called for getting form structure
 	@GetMapping(value = "/json/{className}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -105,10 +108,10 @@ public class DynamicFormController {
 	}
 
 	@GetMapping("/list")
-	public String getList(@ModelAttribute DynamicForm dynamicForm, Model model,RedirectAttributes attributes) {
+	public String getList(@ModelAttribute DynamicForm dynamicForm, Model model, RedirectAttributes attributes) {
 		model.addAttribute("className", dynamicForm.getClassName());
-		attributes.addAttribute("className",dynamicForm.getClassName());
-		System.out.println("inside list :"+dynamicForm.getClassName());
+		attributes.addAttribute("className", dynamicForm.getClassName());
+		System.out.println("inside list :" + dynamicForm.getClassName());
 		return "list";
 	}
 
@@ -132,19 +135,20 @@ public class DynamicFormController {
 //	}
 
 	@GetMapping(value = "/entityList", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody List<?> getList(@RequestParam("className") String className,@RequestParam("filter") String filter) {
+	public @ResponseBody List<?> getList(@RequestParam("className") String className,
+			@RequestParam("filter") String filter) {
 		System.out.println("inside getlist function: " + className);
 		System.out.println("inside getlist function: " + filter);
-		//Gson gson = new Gson();
-		
+		// Gson gson = new Gson();
+
 		List<?> list = null;
 		Predicate<String> isBlank = s -> s.isEmpty();
-		if(isBlank.test(filter)) {
-			 list = jetFormService.getList(className);
-		}else {
+		if (isBlank.test(filter)) {
+			list = jetFormService.getList(className);
+		} else {
 			list = jetFormService.getFilteredList(className, filter);
 		}
-		//String json = gson.toJson(jetFormService.getList(className));
+		// String json = gson.toJson(jetFormService.getList(className));
 		System.out.println("List:" + list);
 		return list;
 	}
@@ -167,19 +171,19 @@ public class DynamicFormController {
 
 		return "view";
 	}
-	
+
 	@GetMapping("/getAutoCompleteSoruceData")
 	@ResponseBody
-	public List<String> getAutoCompleteSoruceData(
-			                                      @RequestParam("className") String className, 
-			                                      @RequestParam("searchField") String searchField,
-			                                      @RequestParam("inputField") String inputField  ){
+	public List<String> getAutoCompleteSoruceData(@RequestParam("className") String className,
+			@RequestParam("searchField") String searchField, @RequestParam("inputField") String inputField) {
 		System.out.println("searchField : " + searchField);
 		System.out.println("className : " + className);
 		System.out.println("inputField : " + inputField);
-                 List<String> autoCompleteSourceData = jetFormService.getAutoCompleteSourceData(className, searchField);
-                 List<String> collect = autoCompleteSourceData.stream().filter(e -> e.toLowerCase().startsWith(inputField.toLowerCase())).collect(Collectors.toList());
-                 System.out.println("collect in  controller: "+collect);
+		List<String> autoCompleteSourceData = jetFormService.getAutoCompleteSourceData(className, searchField);
+		List<String> collect = autoCompleteSourceData.stream()
+				                                       .filter(e -> e.toLowerCase().startsWith(inputField.toLowerCase()))
+				                                       .collect(Collectors.toList());
+		System.out.println("collect in  controller: " + collect);
 		return collect;
 	}
 
@@ -200,14 +204,13 @@ public class DynamicFormController {
 	 * { System.out.println("inside : "); System.out.println(data); return null; }
 	 */
 
-	@RequestMapping(value = "/create", method = RequestMethod.POST)//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/create", method = RequestMethod.POST) // , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody String saveEntity(@RequestParam MultiValueMap<String, Object> formData, Model model) {
-		
 
 		System.out.println("Multiple value map: ");
 		System.out.println(formData);
 		String className = formData.get("className").get(0).toString();
-		 Object saveEntity = jetFormService.saveEntity(formData);
+		Object saveEntity = jetFormService.saveEntity(formData);
 		System.out.println("formData : " + formData);
 		System.out.println("Printing the saved entity ::");
 		System.out.println(saveEntity);
@@ -215,36 +218,75 @@ public class DynamicFormController {
 		return "list";
 		// return "index";
 	}
-	
+
 	@GetMapping("/data")
-	public @ResponseBody List<String> getData(@RequestParam String data){
-		System.out.println("printing the data :: "+data);
-		Map<String,List<String>> dataMap = new TreeMap<>();
-		    dataMap.put("MP", List.of("Indore","Jabalpur","Gwalior","Ujjain"));
-		    dataMap.put("UP", List.of("Ghaziabad","Noida","Meerut","Kanpur"));
-		    dataMap.put("UK", List.of("Dehradun","Haridwar","Roorkee","Rishikesh"));
-		    
-		    List<String> list = dataMap.get(data);
+	public @ResponseBody List<String> getData(@RequestParam String data) {
+		System.out.println("printing the data :: " + data);
+		Map<String, List<String>> dataMap = new TreeMap<>();
+		dataMap.put("MP", List.of("Indore", "Jabalpur", "Gwalior", "Ujjain"));
+		dataMap.put("UP", List.of("Ghaziabad", "Noida", "Meerut", "Kanpur"));
+		dataMap.put("UK", List.of("Dehradun", "Haridwar", "Roorkee", "Rishikesh"));
+
+		List<String> list = dataMap.get(data);
 		return list;
 	}
 	
+	
+
 	@GetMapping("/section")
-	public @ResponseBody List<String> getSection(@RequestParam String data){
-		System.out.println("printing the data :: "+data);
-		Map<String,List<String>> dataMap = new TreeMap<>();
-		    dataMap.put("Section", List.of("Section-A","Section-B","Section-C","Section-D")); 
-		    List<String> list = dataMap.get(data);
+	public @ResponseBody List<String> getSection(@RequestParam String data) {
+		System.out.println("printing the data :: " + data);
+		Map<String, List<String>> dataMap = new TreeMap<>();
+		dataMap.put("Section", List.of("Section-A", "Section-B", "Section-C", "Section-D"));
+		List<String> list = dataMap.get(data);
 		return list;
 	}
 	
-	@PostMapping(value="/uploadFile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@GetMapping("/resource")
+	public @ResponseBody String getResource(@RequestParam("fileName") String fileName) {
+		System.out.println("printing the data :: " + fileName);
+		InputStream resourceAsStream = servletContext.getResourceAsStream(fileName);
+		String asString = asString(resourceAsStream);
+		/*
+		 * Resource loadFilesWithResourceLoader = loadFilesWithResourceLoader(fileName);
+		 * String asString = asString(loadFilesWithResourceLoader);
+		 * System.out.println("asString:::::::::::::::: "+asString);
+		 */
+		System.out.println("asString:::::::::::::::: "+asString);
+		return asString;
+	}
+	
+	public static String asString(InputStream resourceAsStream) {
+        try (Reader reader = new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8)) {
+            return FileCopyUtils.copyToString(reader);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+	
+	public static String asString(Resource resource) {
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
+            return FileCopyUtils.copyToString(reader);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+	
+	public Resource loadFilesWithResourceLoader(String fileName) {
+		
+	    return resourceLoader.getResource(
+	      "classpath:"+fileName);
+	}
+
+	@PostMapping(value = "/uploadFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
-	public String saveFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("uploadPath") String uploadPath) throws IOException {
-			//UploadFileDto uploadFileDto = new UploadFileDto(multipartFile,uploadPath);
-		//System.out.println(uploadFileDto);
-		DocumentMedia savedDocument = jetFormService.saveDocument(multipartFile,uploadPath);
+	public String saveFile(@RequestParam("file") MultipartFile multipartFile,
+			@RequestParam("uploadPath") String uploadPath) throws IOException {
+		// UploadFileDto uploadFileDto = new UploadFileDto(multipartFile,uploadPath);
+		// System.out.println(uploadFileDto);
+		DocumentMedia savedDocument = jetFormService.saveDocument(multipartFile, uploadPath);
 		return savedDocument.getFilePath();
-			//return "1111";
+		// return "1111";
 	}
 ///uploadPath
 	// , consumes = MediaType.APPLICATION_JSON_VALUE
@@ -278,7 +320,7 @@ public class DynamicFormController {
 	public @ResponseBody String deleteEntity(@RequestParam("id") Long id, @RequestParam("className") String className) {
 
 		boolean status = jetFormService.deleteEntity(Long.valueOf(id), className);
-		//boolean status =true;
+		// boolean status =true;
 		return status ? "Deleted" : "Something went wrong";
 	}
 
@@ -300,6 +342,6 @@ public class DynamicFormController {
 
 		System.out.println("after delte method call");
 		return "deleted";
-	}	
-	
+	}
+
 }
