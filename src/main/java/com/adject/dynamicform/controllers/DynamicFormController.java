@@ -210,7 +210,8 @@ public class DynamicFormController {
 		System.out.println("Multiple value map: ");
 		System.out.println(formData);
 		String className = formData.get("className").get(0).toString();
-		Object saveEntity = jetFormService.saveEntity(formData);
+		//Object saveEntity = jetFormService.saveEntity(formData);
+		Object saveEntity = jetFormService.saveEntityByOGNL(formData);
 		System.out.println("formData : " + formData);
 		System.out.println("Printing the saved entity ::");
 		System.out.println(saveEntity);
@@ -254,6 +255,13 @@ public class DynamicFormController {
 		 */
 		System.out.println("asString:::::::::::::::: "+asString);
 		return asString;
+	}
+	
+	@GetMapping("/jsp")
+	public String getResource1(@RequestParam("fileName") String fileName) {
+		
+		System.out.println("asString:::::::::::::::: "+fileName);
+		return fileName;
 	}
 	
 	public static String asString(InputStream resourceAsStream) {
@@ -301,7 +309,7 @@ public class DynamicFormController {
 	 * ObjectMapper().readValue(formData, clazz); saveEntity =
 	 * jetFormService.saveEntity(readValue); System.out.println("Saved entity : "+
 	 * saveEntity); } catch (ClassNotFoundException | JsonProcessingException e) {
-	 * // TODO Auto-generated catch block e.printStackTrace(); }
+	 *  }
 	 * 
 	 * /* JSONArray array = new JSONArray(formData); JSONObject object =
 	 * array.getJSONObject(formData);
@@ -335,7 +343,7 @@ public class DynamicFormController {
 
 		try {
 			jetFormService.deleteMultiple(deletedIdArray, className);
-		} catch (ClassNotFoundException e) { // TODO Auto-generated catch block
+		} catch (ClassNotFoundException e) { 
 			e.printStackTrace();
 			return "something went wrong";
 		}

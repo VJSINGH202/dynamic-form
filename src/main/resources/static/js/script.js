@@ -7,8 +7,8 @@ $(document).ready(function() {
         console.log('form-link click :: ');
         getClassName();
      });
+    
 });
-
 
 
 
@@ -27,7 +27,6 @@ const getClassName = function(){
       console.log(urlParams.get('id'));
       className = urlParams.get('className');
       if(id!=null){
-      
       	getUpdateForm(id,className);
       }
       else{
@@ -677,58 +676,45 @@ const checkInputType = function(element){
 	var element = element;
 	switch(elementType) {
 	  case 'number':
-	    // code block
 	    console.log("number");
 	    result = numberInput(element);
 	    console.log(result);
 	    break;
 	  case 'email':
-		    // code block
 		console.log("email");
 		result = emailInput(element);
 		console.log(result);
 		    break;
       case 'hidden':
-		    // code block
 		console.log("email");
 		result = hiddenInput(element);
 		console.log(result);
 		    break;
 	  case 'password':
-		    // code block
 		console.log("password");
 		result = passwordInput(element);
 		console.log(result);
 		    break;
 	  case 'radio':
-	    // code block
 	    console.log("radio");
-	    //result = radioInput(element);
 	    result = radioOrCheckInput(element,'radio');
 	    console.log(result);
 	    break;
 	  case 'checkbox':
-		    // code block
-	    //result = radioInput(element);
 	    result = radioOrCheckInput(element,'checkbox');
 	    console.log(result);
 		    console.log("checkbox");
 		    break;
-		    
 	  case 'select':
-		    // code block
 		    console.log("select");
 		    result = selectInput(element);
 		    console.log(result);
 		    break;
-		    
       case 'date':
-           // code block
 		    console.log("date");
 		    result = dateInput(element);
 		    console.log(result);
    			break;
-   			
       case 'file':
     	  	console.log('element is file type');
     	  	result=fileInput(element,accept);
@@ -748,17 +734,13 @@ const checkInputType = function(element){
     	  	console.log(result);
     	  	break;
 	  case 'form':
-		    // code block
 		    console.log("form");
 		    result=formInput(element);
     	  	console.log("result: ");
     	  	console.log(result);
-		    //formInput
 		    break;
 	  default:
-	    // code block
 		  console.log("text");
-	 // var element = element;
 	  result = textInput(element);
 	  console.log(result);
 	}
@@ -842,18 +824,6 @@ const getAutoCompleteSourceData = function(input,fieldName){
         //$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
       }
     });
-    /* $.ajax({
-        method: "GET",
-        url: "getAutoCompleteSoruceData",
-        data: { className: className, searchField: search },
-        success: (result) => {
-            console.log(`Printing getAutoCompleteSoruceData :: `);
-            console.log(result);
-        },
-        error: (error) => {
-            console.log(error);
-        }
-    });*/
 };
 
 const hiddenInput = function(element){
@@ -1168,10 +1138,12 @@ const createOneToManyFormFields = function(elements,tBodyRow){
          if(val.fieldType === 'HIDDEN'){
              var result = checkInputType(val);
 	             result.appendTo(tBodyRow);
+	             $(result).removeAttr("class");
          }else if(val.fieldType === 'FORM'){
               
          }else{
 	         var result = checkInputType(val);
+	         $(result).removeAttr("class");
 	         var td = $('<td/>').appendTo(tBodyRow)
 	                result.appendTo(td);
          }
@@ -1194,9 +1166,15 @@ const formInput = function(element){
 		     var tHeadRow = $('<tr/>').appendTo(tHead);
 		     const filterElement = formElement.filter(e => { return e.fieldType !== 'HIDDEN' && e.fieldType !== 'FORM' });
 		     $.each(filterElement,function(e,v){
-		                console.log(`:::::::::: printing the table headers :::::`);
-			     		console.log(v.label);
-			     		$('<th/>').text(v.label).appendTo(tHeadRow);
+	                console.log(`:::::::::: printing the table headers :::::`);
+		     		console.log(v.label);
+		     		$('<th/>').text(v.label).appendTo(tHeadRow);
+			 });
+			 
+			 $.each(formElement,function(e,v){
+		     		console.log(`before name change :: ${JSON.stringify(v.name)}`);
+		     		var ee = $(this).attr('name',element.name+'[0].'+$(this).attr('name'));
+		    		console.log(`after name change :: ${JSON.stringify(v.name)}`);
 			 });
 			 
 			 var tBody = $('<tbody/>').appendTo(table);
@@ -1210,15 +1188,15 @@ const formInput = function(element){
 			      v.remove();
 			 });
 			 
-			  var addRow = $('<button/>',{class:'btn btn-sm btn-outline-primary',type:'button'}).html('<i class="fa fa-plus"></i>');
-			  var deleteRow = $('<button/>',{class:'btn btn-sm btn-outline-danger',type:'button'}).html('<i class="fa fa-minus"></i>');
+			 var addRow = $('<button/>',{class:'btn btn-sm btn-outline-primary',type:'button'}).html('<i class="fa fa-plus"></i>');
+			 var deleteRow = $('<button/>',{class:'btn btn-sm btn-outline-danger',type:'button'}).html('<i class="fa fa-minus"></i>');
 			 
 			 $(table).before(addRow);
 			 $(table).before(deleteRow);
 			 addRowOnclick(addRow,table);
 			 deleteRowOnclick(deleteRow,table);
 		} else {
-		     console.log(':::: Rendering the ONE_TO_ONE ::::');
+		    console.log(':::: Rendering the ONE_TO_ONE ::::');
 			var fieldset =  $('<fieldset/>',{class:"border p-2"}).appendTo(inputWrapper);
 			var legend = $('<legend/>',{class:'float-none w-auto p-2'}).text(element.label).appendTo(fieldset);
 		
@@ -1226,9 +1204,10 @@ const formInput = function(element){
 			var formElement = element.jetFormWrapper.elements;
 			console.log(element.formClass);
 			//element.jetFormWrapper.elements
-		   $.each(formElement,function(e,v){
+		    $.each(formElement,function(e,v){
 			     		console.log(`before name change :: ${JSON.stringify(v.name)}`);
-			     		var ee = $(this).attr('name',element.id+'.'+$(this).attr('name'));
+			     		var ee = $(this).attr('name',element.name+'.'+$(this).attr('name'));
+			     		console.log($(this));
 			    		console.log(`after name change :: ${JSON.stringify(v.name)}`);
 			});
 			console.log(`changed name change :: ${JSON.stringify(element.jetFormWrapper.elements)}`);
@@ -1241,12 +1220,18 @@ const formInput = function(element){
 const addRowOnclick = function(addRowButton,table){
    $(addRowButton).on('click',function(){
       console.log('::: addRowButton click::: ');
-      var tr = $(table).find('tbody tr:first');
+      var firstTr = $(table).find('tbody tr:first');
+      var tr = $(table).find('tbody tr');
       console.log('printing the table row');
-      console.log(tr);
-      console.log(tr[0].outerHTML);//[0]   [0].outerHTML
-      var firstRow = tr[0].outerHTML;
-      $(table).find('tbody tr:last').after(`${firstRow}`);
+      console.log(firstTr);
+      console.log(firstTr[0].outerHTML);//[0]   [0].outerHTML
+      const rowLenght = $(tr).length;
+      console.log(rowLenght);
+      var firstRowHtml = firstTr[0].outerHTML;
+       
+      var firstRowWithIndex =firstRowHtml.replaceAll("[0]", "["+(rowLenght)+"]"); 
+      console.log(firstRowWithIndex);
+      $(table).find('tbody tr:last').after(`${firstRowWithIndex}`);
     });
 }
 
@@ -1342,6 +1327,7 @@ const fileOnClick = function(file,uploadPath){
 };
 
 const dateInput = function(element){
+	
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
 	var disabled = element.disabled ? 'disabled' : false;
@@ -1381,14 +1367,14 @@ const formatDate = function(dateInput,format){
 
 const customFieldInput = function(element){
 	var element = element
-	var readOnly = element.readOnly ? 'readonly' : false;
-	var disabled = element.disabled ? 'disabled' : false;
+	
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		    label.appendTo(inputWrapper);
 		 console.log(element.filePath);
 		   // $.get(element.filePath)
-		    $.get('resource',{ fileName: element.filePath})
+		   // $.get('resource',{ fileName: element.filePath})
+		     $.get('jsp',{ fileName: element.filePath})
 	    	      .done(function(data) {
 		    		 console.log('Success :-) '+data)
 		    	     $('<div/>').html(data).appendTo(inputWrapper);})

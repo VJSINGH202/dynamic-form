@@ -277,12 +277,16 @@ function checkAll(event){
 								if(val == k){
 									console.log(k);	
 									
-									if(isDateType(v)){
+									if(isDateOrObjectType(v) === 'date'){
 										tr.append("<td>"+convertDate(v)+"</td>");
 										//tr.append("<td>"+JSON.stringify(v)+"</td>");
-									}else{
-										
-										tr.append("<td>"+v+"</td>");
+									}else if(isDateOrObjectType(v) === 'object'){
+                                        //printObject
+                                        //tr.append("<td>"+printObject(v)+"</td>");
+                                        printObject(v);
+										tr.append("<td>"+JSON.stringify(v)+"</td>");
+									}else {
+										tr.append("<td>"+  ((v === null) ? '-' : v) +"</td>");
 									}
 									
 									console.log("Printing : "+typeof v);
@@ -305,7 +309,7 @@ function checkAll(event){
 			
 		});
 	}
-	
+
 	function updateEntity(id,classname){
 		console.log('updateEntity'+id+' '+classname);
 		var myModal = new bootstrap.Modal($('#jet-form-modal'), {
@@ -357,12 +361,30 @@ function checkAll(event){
 			}
 		});
 	}
+
+
+   const printObject = function(data){
+       $.each(data,function(key,value){
+            console.log('key : '+data[key] + ' value : '+value);
+            console.log(data[key]);
+            console.log(value);
+       });
+       Object.keys(data).map(function(k){ 
+    	    console.log("key with value: "+k +" = "+data[k])    
+    	    
+    	    });
+   }
+   
 	
-	const isDateType = function(date){
-		if(typeof date === 'object'){
+	const isDateOrObjectType = function(date){
+		if(date !== null && typeof date === 'object'){
 			console.log('inside');
-			return true;
-		}
+			 if(date.hasOwnProperty('day') && date.hasOwnProperty('month') && date.hasOwnProperty('year'))
+			    return 'date';
+			 else
+			    return 'object';
+		}else 
+			return '-';
 	};
 	
   const formatDateUI = function(date) {
@@ -374,6 +396,9 @@ function checkAll(event){
 	}
 	
 	const convertDate = function(date){
+		if(date == null){
+            return "-"
+		}
 		console.log('inside convertDate');
 		console.log(date);
 		var date = date;

@@ -48,10 +48,6 @@
 		</form:form>
 	</div>
 	<hr/>
-	<div class="container">
-	   <div id="result">
-	   </div> 
-	</div>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
 		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
 		crossorigin="anonymous"></script>
@@ -60,7 +56,7 @@
 		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
 		crossorigin="anonymous"></script>
 	
-	<script type="text/javascript">
+	<!-- <script type="text/javascript"> 
 	    $(document).ready(function(){
 	    	console.log("ready :-) ");
 	    	/* $.get('select.html',function(data){
@@ -87,6 +83,6 @@
 	    		 console.log(data);
 	    	 });
 	    });	
-	</script>
+	</script>-->
 </body>
 </html>
