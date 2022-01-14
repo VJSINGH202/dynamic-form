@@ -5,14 +5,14 @@ $(document).ready(function() {
 //    getClassName();
     $('#form-link').on('click',function(){
         console.log('form-link click :: ');
-        getClassName();
+        renderForm();
      });
-    
+     //renderForm();
 });
 
 
 
-const getClassName = function(){
+const renderForm = function(){
    
     console.log('getting classname : ');
     //it searches the parameter in query string 
@@ -82,8 +82,31 @@ const form = function(form,className){
 	console.log(typeof form)
 	console.log(form.elements);
 	var elements = form.elements;
-	var action = getFormAction(form.actions);
+    var groups =  form.groups;
+    var formTemplate = form.formTemplate;
 	
+	
+
+	   if(formTemplate !== ""){
+		createTemplateForm(groups);
+	   }else{
+		   var htmlform = createCardForm(form,className);
+		   if (groups === undefined || groups.length == 0) {
+             // array empty or does not exist
+              createFormFields(elements,htmlform);
+           }else{
+	         createFormUsingGroups(groups,htmlform)
+           }
+            var action = getFormAction(form.actions);
+            createSubmitButton(action,htmlform);
+	        formValidation(elements,htmlform);
+	   } 
+	   	 
+	//  onFormSubmit(action,form,className);
+}
+
+const createCardForm = function(form,className){
+	var action = getFormAction(form.actions);
 	var card = $('<div/>',{class:'card'}).appendTo('#jet-form');
 	var cardHeader = $('<div/>',{class:'card-header text-white bg-primary'}).appendTo(card);
 	      createCardHeader(className,form.title).appendTo(cardHeader);
@@ -96,10 +119,77 @@ const form = function(form,className){
 	  console.log("Type of form : ")
 	  console.log(typeof form)
 	  console.log(form)
-	  createFormFields(elements,form);
-	  createSubmitButton(action,form);
-	  formValidation(elements,form);
-	//  onFormSubmit(action,form,className);
+	  return form;
+};
+
+const createTemplateForm = function(groups){
+	$.each(groups,function(key,group){
+	   	 createGroupFormFields(group,'#'+group.id);
+	});
+}
+
+const createTemplateFormFields = function(group){
+	const id = group.id;
+	const label = group.label;
+	const group_card = $('<div/>',{class:'card mb-1',id:id}).appendTo(id);
+	//const group_card_header = $('<div/>',{class:'card-header'}).text(label).appendTo(group_card);
+	const group_card_body = $('<div/>',{class:'card-body'}).appendTo(group_card);
+	$('<h5/>',{class:'card-title'}).text(label).appendTo(group_card_body);
+	const elementsPerRow = group.elementsPerRow;
+	const elements = group.elements;
+	const cols_size = (12 / elementsPerRow);
+    const row	= $('<div/>',{class:'row'}).appendTo(group_card_body);
+     $.each(elements, function (key, val) {
+        console.log("each value: ");
+        console.log(val);
+       const col = $('<div/>',{class:'col-sm-'+cols_size}).appendTo(row);
+       var result = checkInputType(val);
+       if(result !== null){
+               if(Array.isArray(result)){
+                $.each(result, function(key, val){
+                	val.appendTo(col);
+                });
+               }else{
+                	result.appendTo(col);
+               } 
+         }
+       
+    });
+};
+
+const createFormUsingGroups = function(groups,form){
+	$.each(groups,function(key,group){
+	   	 createGroupFormFields(group,form);
+	});
+};
+
+const createGroupFormFields = function(group,form){
+	const id = group.id;
+	const label = group.label;
+	const group_card = $('<div/>',{class:'card mb-1',id:id}).appendTo(form);
+	//const group_card_header = $('<div/>',{class:'card-header'}).text(label).appendTo(group_card);
+	const group_card_body = $('<div/>',{class:'card-body'}).appendTo(group_card);
+	$('<h5/>',{class:'card-title'}).text(label).appendTo(group_card_body);
+	const elementsPerRow = group.elementsPerRow;
+	const elements = group.elements;
+	const cols_size = (12 / elementsPerRow);
+    const row	= $('<div/>',{class:'row'}).appendTo(group_card_body);
+     $.each(elements, function (key, val) {
+        console.log("each value: ");
+        console.log(val);
+       const col = $('<div/>',{class:'col-sm-'+cols_size}).appendTo(row);
+       var result = checkInputType(val);
+       if(result !== null){
+               if(Array.isArray(result)){
+                $.each(result, function(key, val){
+                	val.appendTo(col);
+                });
+               }else{
+                	result.appendTo(col);
+               } 
+         }
+       
+    });
 }
 
 /*const formValidation = function(elements,form){
@@ -917,12 +1007,108 @@ const onParentChange = function(element,selectInput){
                          
 };
 
-const renderChilds = function(value,selectInputValue){
-console.log(`:::::::::::::::::::renderChilds ::::::::::::::`);
-    const {child, datapath, type} = value;
-    
-    if(type === 'load'){
-       console.log($('#'+child));
+const loadCheck = function(data,selectInputValue){
+	const {child, datapath, type} = data;
+	console.log($('#'+child));
+	        $.ajax({
+			        url: datapath,
+			        type: "GET", 
+			        data: {'data' : selectInputValue}, 
+			        success: function (data, textStatus, jqXHR) {
+				       var name = child;
+			           var  inputWrapper = $('#'+child).parent().parent();
+			                
+			           console.log(inputWrapper);
+			            var firstChild = $(inputWrapper)[0].children[0];
+			            console.log($(firstChild));
+			              var labelText =  $(firstChild).text();
+			            $(inputWrapper).empty();
+                        console.log("success :: "+data);
+			             const optionsData = data.toString().split(',');
+			            console.log(optionsData);
+			            var wrapper = [];
+			          //[0].children[0]
+			              
+			            $.each(optionsData, function (key, val) {
+			            var radioWrapper = $('<div/>', {class : 'form-check form-check-inline'});
+                        var radioLabel = $('<label/>', {for : name ,class : 'form-check-label'}).text(val);
+                        radioLabel.appendTo(radioWrapper);
+                        var radio = $('<input/>').attr({ type: 'checkbox',class:'form-check-input',value: val, id: name, name: name}).appendTo(radioWrapper);
+				    	  wrapper.push(radioWrapper);
+				    	});
+				    	var label = $('<label/>', {for : name ,class : 'form-label d-block'}).text(labelText);
+				    	label.appendTo(inputWrapper);
+				    	labelText = '';
+				    	console.log(wrapper)
+				    	if(Array.isArray(wrapper)){
+                              $.each(wrapper, function(key, val){
+            	                 val.appendTo(inputWrapper);
+                              });
+		                 }
+		                 $(inputWrapper).attr('class','mb-3')
+			        },
+			        error: function (jqXHR, textStatus, errorThrown) {
+			            console.log("jqXHR:" + jqXHR);
+			            console.log("TestStatus: " + textStatus);
+			            console.log("ErrorThrown: " + errorThrown);
+			        }
+			    });
+}
+
+const loadRadio = function(data,selectInputValue){
+	const {child, datapath, type} = data;
+	console.log($('#'+child));
+	        $.ajax({
+			        url: datapath,
+			        type: "GET", 
+			        data: {'data' : selectInputValue}, 
+			        success: function (data, textStatus, jqXHR) {
+				       var name = child;
+			           var  inputWrapper = $('#'+child).parent().parent();
+			                
+			           console.log(inputWrapper);
+			            var firstChild = $(inputWrapper)[0].children[0];
+			            console.log($(firstChild));
+			              var labelText =  $(firstChild).text();
+			            $(inputWrapper).empty();
+                        console.log("success :: "+data);
+			            const optionsData = data.toString().split(',');
+			            console.log(optionsData);
+			            var wrapper = [];
+			          //[0].children[0]
+			              
+			            $.each(optionsData, function (key, val) {
+			            var radioWrapper = $('<div/>', {class : 'form-check form-check-inline'});
+                        var radioLabel = $('<label/>', {for : name ,class : 'form-check-label'}).text(val);
+                        radioLabel.appendTo(radioWrapper);
+                        var radio = $('<input/>').attr({ type: 'radio',class:'form-check-input',value: val, id: name, name: name}).appendTo(radioWrapper);
+				    	  wrapper.push(radioWrapper);
+				    	});
+				    	var label = $('<label/>', {for : name ,class : 'form-label d-block'}).text(labelText);
+				    	label.appendTo(inputWrapper);
+				    	labelText = '';
+				    	console.log(wrapper)
+				    	if(Array.isArray(wrapper)){
+                              $.each(wrapper, function(key, val){
+            	                 val.appendTo(inputWrapper);
+                              });
+		                 }
+		                 $(inputWrapper).attr('class','mb-3')
+			        },
+			        error: function (jqXHR, textStatus, errorThrown) {
+			            console.log("jqXHR:" + jqXHR);
+			            console.log("TestStatus: " + textStatus);
+			            console.log("ErrorThrown: " + errorThrown);
+			        }
+			    });
+}
+
+
+const loadSelect = function(data,selectInputValue){
+	const {child, datapath, type} = data;
+	console.log('Printing the child ::::: ');
+             console.log($('#'+child));
+             console.log($('#'+child)[0].className);
              var firstOption =  $('#'+child).find('option:eq(0)');
               $('#'+child).empty();
              console.log(`Printing the firstOption ::::::::::`);
@@ -954,7 +1140,7 @@ console.log(`:::::::::::::::::::renderChilds ::::::::::::::`);
 				            	//console.log(selectInput)
 				            });
 						}
-						//$(selectInput).chosen({width: "100%"});
+						//$(selectInput).chosen({width: "100%"}); [0].className
 						$('#'+child).trigger("chosen:updated");
 			        },
 			        error: function (jqXHR, textStatus, errorThrown) {
@@ -963,11 +1149,32 @@ console.log(`:::::::::::::::::::renderChilds ::::::::::::::`);
 			            console.log("ErrorThrown: " + errorThrown);
 			        }
 			    });
+}
+
+const renderChilds = function(value,selectInputValue){
+console.log(`:::::::::::::::::::renderChilds ::::::::::::::`);
+    const {child, datapath, type} = value;
+    
+    if(type === 'load'){
+	           
+	         if($('#'+child)[0].className === 'chosen-select form-select'){
+		          loadSelect({child, datapath, type},selectInputValue);
+	          }else if($('#'+child).attr("type")==='radio'){
+		          loadRadio({child, datapath, type},selectInputValue);
+	          }else{
+		          loadCheck({child, datapath, type},selectInputValue);
+		           console.log($('#'+child).attr("type"));
+	          }
+	          
+	         
     }else{
              console.log(`::::::::::::::::::: Inside Hidden else Block :::::::::::::::::`);
              if(selectInputValue === datapath){
              console.log(`::::::::::::::::::: selectInputValue : ${selectInputValue} |  datapath : ${datapath} :::::::::::::::::`);
              console.log(`::::: hide element ::::::::`);
+             console.log('printing the radio child :::: ');
+             console.log($('#'+child));
+             console.log($('#'+child).attr('type'));
              console.log($('#'+child).parent());
                $('#'+child).parent().hide();
              }else{
@@ -1042,9 +1249,13 @@ const radioOrCheckInput = function(element,elementType){
 	var readOnly = element.readOnly ? 'readonly' : false;
 	var disabled = element.disabled ? 'disabled' : false;
 		
-		var inputWrapper = $('<div/>', {class : 'mb-3'});
-		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
-		    label.appendTo(inputWrapper);
+		var inputWrapper;
+		if(element.options !== undefined){
+			inputWrapper = $('<div/>', {class : 'mb-3'});
+		    var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
+		    label.appendTo(inputWrapper);	
+		}
+		
 		
 		var wrapper = [];
 		
@@ -1057,13 +1268,24 @@ const radioOrCheckInput = function(element,elementType){
             radioLabel.appendTo(radioWrapper);
             var radio;
             if(value === element.value){
-               radio =  $('<input/>').attr({ type: elementType,class:'form-check-input jet-'+element.name , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled ,checked : 'checked'}).appendTo(radioWrapper);
+               radio =  $('<input/>').attr({ type: elementType,class:'form-check-input' , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled ,checked : 'checked'}).appendTo(radioWrapper);
             }else{
-       	       radio = $('<input/>').attr({ type: elementType,class:'form-check-input jet-'+element.name , id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled}).appendTo(radioWrapper);
+       	       radio = $('<input/>').attr({ type: elementType,class:'form-check-input', id: element.id, name: element.name, placeholder : element.placeHolder ,value: value ,readonly : readOnly ,disabled : disabled}).appendTo(radioWrapper);
        		}
        		radioInput.push(radio);
        		wrapper.push(radioWrapper);
     		});
+    		
+        if(element.dataProvider !== undefined && element.dataProvider.resource === 'REST'){
+	        inputWrapper = $('<div/>');
+	        var label = $('<label/>', {for : element.id ,class : 'form-label d-none'}).text(element.label);
+		    label.appendTo(inputWrapper);	
+	        var radioWrapper = $('<div/>', {class : 'form-check form-check-inline'});
+			var radioLabel = $('<label/>', {for : element.id ,class : 'form-check-label'});
+            radioLabel.appendTo(radioWrapper);
+            var radio = $('<input/>').attr({ type: elementType,class:'form-check-input d-none', id: element.id, name: element.name, placeholder : element.placeHolder ,readonly : readOnly ,disabled : disabled}).appendTo(radioWrapper);
+            wrapper.push(radioWrapper);
+        }
     		
 		if(Array.isArray(wrapper)){
             $.each(wrapper, function(key, val){

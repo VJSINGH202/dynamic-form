@@ -172,6 +172,14 @@ public class DynamicFormController {
 		return "view";
 	}
 
+	@GetMapping("/invoice")
+	public String getInvoice(@RequestParam("className") String className) {
+		
+		System.out.println("className : " + className);
+
+		return "invoice";
+	}
+	
 	@GetMapping("/getAutoCompleteSoruceData")
 	@ResponseBody
 	public List<String> getAutoCompleteSoruceData(@RequestParam("className") String className,

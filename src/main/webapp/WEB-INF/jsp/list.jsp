@@ -277,7 +277,7 @@ function checkAll(event){
 								if(val == k){
 									console.log(k);	
 									
-									if(isDateOrObjectType(v) === 'date'){
+									/* if(isDateOrObjectType(v) === 'date'){
 										tr.append("<td>"+convertDate(v)+"</td>");
 										//tr.append("<td>"+JSON.stringify(v)+"</td>");
 									}else if(isDateOrObjectType(v) === 'object'){
@@ -287,8 +287,8 @@ function checkAll(event){
 										tr.append("<td>"+JSON.stringify(v)+"</td>");
 									}else {
 										tr.append("<td>"+  ((v === null) ? '-' : v) +"</td>");
-									}
-									
+									} */
+									tr.append("<td>"+isDateOrObjectType(v)+"</td>");
 									console.log("Printing : "+typeof v);
 									///isDateType(v);
 								}
@@ -364,15 +364,47 @@ function checkAll(event){
 
 
    const printObject = function(data){
-       $.each(data,function(key,value){
-            console.log('key : '+data[key] + ' value : '+value);
-            console.log(data[key]);
-            console.log(value);
-       });
-       Object.keys(data).map(function(k){ 
-    	    console.log("key with value: "+k +" = "+data[k])    
-    	    
-    	    });
+	   console.log("Printing the lenght ::: "+data.lenght);
+	   if(data.lenght === 'undefined'){
+		   console.log('-');
+		   return;
+	   }
+	   if(Array.isArray(data)) {
+		   const header = [];
+		   const rows = [];
+	       $.each(data,function(key,value){
+	            console.log(key);
+	            console.log(value);
+	            const row = [];
+	            $.each(value,function(k,val){
+	                
+	            	if(key == 0) header.push(k);
+	                
+	                row.push(val);
+	            	console.log(k);
+	                console.log(val);
+	            });
+	            rows.push(row);
+	       });
+	       console.log(header);
+	       console.log(rows);
+	       var table = $('<table/>',{class:'table'});
+	       var tHeader = $('<thead/>').appendTo(table);
+	       $.each(header,function(k,v){
+	              $('<th/>').text(v).appendTo(tHeader);
+	       });
+	       $('<tbody/>').appendTo(table);
+	       $.each(rows,function(k,v){
+	           $('')
+	              $.each(v,function(key,val){
+	                
+	              })
+	       });
+		} else {
+			console.log(data);
+		}
+	   
+       
    }
    
 	
@@ -380,11 +412,14 @@ function checkAll(event){
 		if(date !== null && typeof date === 'object'){
 			console.log('inside');
 			 if(date.hasOwnProperty('day') && date.hasOwnProperty('month') && date.hasOwnProperty('year'))
-			    return 'date';
-			 else
-			    return 'object';
+			    return convertDate(date);
+			 else{
+				 printObject(date);
+				 return JSON.stringify(date);
+				 }
+			   
 		}else 
-			return '-';
+			return ((date === null) ? '-' : date);
 	};
 	
   const formatDateUI = function(date) {
