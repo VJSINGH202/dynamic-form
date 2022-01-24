@@ -842,11 +842,12 @@ const textInput = function(element){
 	var element = element
 	var readOnly = element.readOnly ? 'readonly' : false;
 	var disabled = element.disabled ? 'disabled' : false;
+	var cssClass = 'text-'+element.name;
 	
 		var inputWrapper = $('<div/>', {class : 'mb-3'});
 		var label = $('<label/>', {for : element.id ,class : 'form-label'}).text(element.label);
 		            label.appendTo(inputWrapper);
-		var textInput = $('<input/>').attr({ type: 'text',class:'form-control' ,id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
+		var textInput = $('<input/>').attr({index : '',type: 'text',class:'form-control '+cssClass ,id: element.id, name: element.name, placeholder : element.placeHolder ,value: element.value ,readonly : readOnly,disabled : disabled}).appendTo(inputWrapper);
 	
 	    console.log(`${element.name} is Autocomplete : ${element.autoComplete}`);
 	    if(element.autoComplete){
@@ -854,9 +855,41 @@ const textInput = function(element){
 	      // onAutoCompleteInput(textInput,element.name);
 	       getAutoCompleteSourceData(textInput,element.name);
 	    }
+	     checkSubscribeEvents(element.subscribeEvents);
 	
 	return inputWrapper;
 }
+
+const checkSubscribeEvents = function(subscribeEvents){
+	if(subscribeEvents.length !== 0){
+		console.log('inside checkSubscribeEvents');
+		$.each(subscribeEvents,function(key,subscribeEvent){
+			checkAndTriggerEvent(subscribeEvent);
+		});
+		 
+	  }
+}
+
+const checkAndTriggerEvent = function(subscribeEvents){
+	const source = subscribeEvents.source;
+	const name = subscribeEvents.name;
+	const action = subscribeEvents.action;
+	console.log('inside checkAndTriggerEvent ');
+	console.log(source+' | '+name +' | '+action);
+	if(name === 'onChange'){
+		console.log(source+' | '+name +' | '+action);
+		createOnChangeEvent('#'+source,action)
+	}
+	
+};
+
+const createOnChangeEvent = function(source,action){
+	$(document).on('change',source,function(){
+		console.log('createOnChangeEvent called on '+source);
+		eval(action);
+		//poiOnchange(source);
+	});
+};
 
 /*
 const onAutoCompleteInput = function(input,fieldName){
@@ -929,7 +962,7 @@ const hiddenInput = function(element){
 }
 
 const selectInput = function(element){
-	var element = element
+	var element = element;
 	var readOnly = element.readOnly ? 'readonly' : false;
 	var disabled = element.disabled ? 'disabled' : false;
 	var multiple = element.multiSelect ? 'multiple' : false;
@@ -939,7 +972,7 @@ const selectInput = function(element){
 		var label = $('<label/>', {for : element.id ,class : 'form-label d-block'}).text(element.label);
 		label.appendTo(inputWrapper);
 		//form-select
-   		var selectInput = $('<select/>').attr({class:'chosen-select form-select' , id: element.id, name: element.name, 'data-placeholder' :element.placeHolder ,placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled, multiple:multiple}).appendTo(inputWrapper);
+   		var selectInput = $('<select/>').attr({class:'chosen-select form-select' , name: element.name, 'data-placeholder' :element.placeHolder ,placeholder : element.placeHolder ,value: element.value ,readonly : readOnly ,disabled : disabled, multiple:multiple}).appendTo(inputWrapper);
    		//var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);
    		
    		//$(selectInput).searchit({textFieldClass:'form-control', noElementText:"No matches"});
@@ -972,7 +1005,8 @@ const selectInput = function(element){
             });
 		}
 		
-		$(selectInput).chosen({width: "100%"});
+		//$(selectInput).chosen({width: "100%"});
+		$(selectInput).attr("id",element.id);
 		/*
 		   
 		   if(element.dependField !== ''){
@@ -982,6 +1016,8 @@ const selectInput = function(element){
 		console.log(`:::::::::::::::::::::  onParentChange(element,selectInput); :::::::::::::::::::::::`);
 		       onParentChange(element,selectInput);
 		}
+		
+		checkSubscribeEvents(element.subscribeEvents);
 		
 	return inputWrapper;
 }

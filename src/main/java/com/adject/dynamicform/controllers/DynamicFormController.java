@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -240,7 +242,60 @@ public class DynamicFormController {
 		return list;
 	}
 	
+	@GetMapping("/client")
+	public @ResponseBody List<String> getClient(@RequestParam String client) {
+		System.out.println("printing the client :: " + client);
+		Map<String, List<String>> dataMap = new TreeMap<>();
+		dataMap.put("TSC", List.of("IGST:7", "CGST:8", "SES:9"));
+		dataMap.put("WIPRO", List.of("IGST:7", "CGST:8"));
+		
+
+		List<String> list = dataMap.get(client);
+		return list;
+	}
 	
+	@GetMapping("/purchaseorderitem")
+	public @ResponseBody List<String> getPurchaseOrderItems(@RequestParam String purchaseOrderId){
+		
+		System.out.println("printing the purchaseOrder :: " + purchaseOrderId);
+		Map<String, List<String>> dataMap = new TreeMap<>();
+		dataMap.put("PO1", List.of("1:POI-1", "2:POI-2"));
+		dataMap.put("PO2", List.of("3:POI-3", "4:POI-4"));
+		dataMap.put("PO3", List.of("5:POI-5", "6:POI-6"));
+		dataMap.put("PO4", List.of("7:POI-7", "8:POI-8"));
+		List<String> list = dataMap.get(purchaseOrderId);
+		return list;
+	}
+	
+	@GetMapping("/purchaseorderitemdata")
+	public @ResponseBody List<String> getPurchaseOrderItemsData(@RequestParam String purchaseOrderItemId){
+		
+		System.out.println("printing the purchaseOrder :: " + purchaseOrderItemId);
+		// quantity , poitem, description, amount
+		Map<String, List<String>> dataMap = new TreeMap<>();
+		dataMap.put("1", List.of("2", "POI-1", "DESC - 1", "10000"));
+		dataMap.put("2", List.of("3", "POI-2", "DESC - 2", "11000"));
+		dataMap.put("3", List.of("1", "POI-3", "DESC - 3", "12000"));
+		dataMap.put("4", List.of("1", "POI-4", "DESC - 4", "11000"));
+		dataMap.put("5", List.of("3", "POI-5", "DESC - 5", "13000"));
+		dataMap.put("6", List.of("2", "POI-6", "DESC - 6", "12000"));
+		dataMap.put("7", List.of("3", "POI-7", "DESC - 7", "10000"));
+		dataMap.put("8", List.of("2", "POI-8", "DESC - 8", "15000"));
+		
+		List<String> list = dataMap.get(purchaseOrderItemId);
+		return list;
+	}
+	
+	@GetMapping("/clientpurchaseorder")
+	public @ResponseBody List<String> getClientPurchaseOrder(@RequestParam String clientId){
+		
+		System.out.println("printing the clientId :: " + clientId);
+		Map<String, List<String>> dataMap = new TreeMap<>();
+		dataMap.put("TSC", List.of("PO1:PO-1", "PO2:PO-2"));
+		dataMap.put("WIPRO", List.of("PO3:PO-3", "PO4:PO-4"));
+		List<String> list = dataMap.get(clientId);
+		return list;
+	}
 
 	@GetMapping("/section")
 	public @ResponseBody List<String> getSection(@RequestParam String data) {
