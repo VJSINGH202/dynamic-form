@@ -61,8 +61,36 @@
 
 	    console.log("inside invoice.jsp")
 	    renderForm();
-	    onClientChangePoplutePurchaseOrder();
+	   // onClientChangePoplutePurchaseOrder();
 	});
+
+function onClientChange(source){
+	alert("printing the onClientChange invoice.jsp ::: ");
+	 const clientId = $(source).val();
+	 
+	 
+     console.log("printing the onClientChange invoice.jsp ::: "+clientId);
+     
+		$.ajax({
+			type:'GET',
+			url:'/dynamic/clientpurchaseorder',
+			data: {'clientId' : clientId},
+			success:function(data){
+				console.log("printing the clientId :::: ")
+				console.log(data);
+				$('select#purchaseorder option:not(:first)').remove();
+				$.each(data,function(key,val){
+					const [id,labelText] = val.split(':');
+					console.log("labelText :- "+labelText +" id :- "+id);
+					$('<option/>',{value:id}).text(labelText).appendTo('select#purchaseorder');
+				});
+			},
+			error:function(data){
+				console.log(data)
+			}
+			
+		});
+}
 	 
 	function onClientChangePoplutePurchaseOrder(){
 		 $(document).on('change','select#client',function(){
@@ -93,8 +121,10 @@
 
     function poiOnchange(poi){
         alert("poi"+poi);
-       console.log(poi);
+        console.log('inside invoice.js ::: '+poi);
     }
+
+    
 	</script>
 	
 </body>

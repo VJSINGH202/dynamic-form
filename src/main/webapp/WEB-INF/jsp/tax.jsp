@@ -36,9 +36,9 @@ function calculateClientTax(subTotal){
 
 
 function onClientChange(){
-	$('select#client').change(function(){
-		console.log('inside onClientChange');
-        var client = $("select#client").val();
+	$('.select-client').change(function(){
+		console.log('inside onClientChange tax.jsp');
+        var client = $(this).val();
         
         console.log('client value :- ',client);
          getClientTax(client);
@@ -47,7 +47,7 @@ function onClientChange(){
 
 function getClientTax(client){
 	   $('#client-tax').empty();
-	   console.log('inside getClientTax');
+	   console.log('inside getClientTax tax.jsp');
 	   $.ajax({
 			type:'GET',
 			url:'/dynamic/client',
