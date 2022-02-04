@@ -818,9 +818,9 @@ const checkInputType = function(element) {
 			console.log("result: ");
 			console.log(result);
 			break;
-		case 'custom_field':
+		case 'template':
 			console.log('element is textarea type');
-			result = customFieldInput(element);
+			result = templateInput(element);
 			console.log("result: ");
 			console.log(result);
 			break;
@@ -911,7 +911,7 @@ const findSourceElement = function(elements,source){
 		console.log(`Printing the cssClass |${cssClass}| inside form return`)
 		    return false;*/
 		    return flag;
-		}else if(element.fieldType === 'CUSTOM_FIELD'){
+		}else if(element.fieldType === 'TEMPLATE'){
 			return false;
 		}else if(element.name === source){
 			console.log(`inside if(element.name === ${source})`);
@@ -970,7 +970,7 @@ const getFieldType = function(fieldType) {
 			console.log('element is textarea type');
 			type = 'textarea-';
 			break;
-		case 'custom_field':
+		case 'template':
 			console.log('custom_field');
 			type = 'customfield-';
 			break;
@@ -1799,7 +1799,7 @@ const formatDate = function(dateInput, format) {
 	});//.trigger("change")
 };
 
-const customFieldInput = function(element) {
+const templateInput = function(element) {
 	var element = element
 
 	var inputWrapper = $('<div/>', { class: 'mb-3' });
