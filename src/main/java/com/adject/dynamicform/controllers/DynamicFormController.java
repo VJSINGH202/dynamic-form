@@ -19,7 +19,9 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -35,12 +37,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.adject.dynamicform.modal.DynamicForm;
+import com.adject.dynamicform.model.DynamicForm;
+import com.adject.dynamicform.service.ClientService;
 import com.google.gson.Gson;
 
 import io.jetform.core.annotation.model.JetFormWrapper;
 import io.jetform.core.engine.helper.FormRenderer;
+import io.jetform.core.entity.Client;
 import io.jetform.core.entity.DocumentMedia;
+import io.jetform.core.entity.TaxItem;
 import io.jetform.core.service.JetFormService;
 
 @Controller
@@ -57,6 +62,9 @@ public class DynamicFormController {
 
 	@Autowired
 	ServletContext servletContext;
+	
+	@Autowired 
+	private ClientService clientService;
 	
 //	@PostMapping("/generate")
 //	public String generateForm(@ModelAttribute DynamicForm dynamicForm, Model model) {
@@ -146,8 +154,10 @@ public class DynamicFormController {
 		List<?> list = null;
 		Predicate<String> isBlank = s -> s.isEmpty();
 		if (isBlank.test(filter)) {
+			System.out.println("not filter");
 			list = jetFormService.getList(className);
 		} else {
+			System.out.println("inside filter");
 			list = jetFormService.getFilteredList(className, filter);
 		}
 		// String json = gson.toJson(jetFormService.getList(className));
@@ -180,6 +190,14 @@ public class DynamicFormController {
 		System.out.println("className : " + className);
 
 		return "invoice";
+	}
+	
+	@GetMapping("/candidate")
+	public String getcandidate(@RequestParam("className") String className) {
+		
+		System.out.println("className : " + className);
+
+		return "candidate";
 	}
 	
 	@GetMapping("/getAutoCompleteSoruceData")
@@ -215,7 +233,7 @@ public class DynamicFormController {
 	 */
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST) // , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody String saveEntity(@RequestParam MultiValueMap<String, Object> formData, Model model) {
+	public @ResponseBody ResponseEntity<DynamicEntity> saveEntity(@RequestParam MultiValueMap<String, Object> formData, Model model) {
 
 		System.out.println("Multiple value map: ");
 		System.out.println(formData);
@@ -224,9 +242,11 @@ public class DynamicFormController {
 		Object saveEntity = jetFormService.saveEntityByOGNL(formData);
 		System.out.println("formData : " + formData);
 		System.out.println("Printing the saved entity ::");
-		System.out.println(saveEntity);
-		model.addAttribute("className", className);
-		return "list";
+		System.out.println(saveEntity); 
+		model.addAttribute("className", className); 
+		System.out.println("formData : " + formData);
+		DynamicEntity dynamicEntity = new DynamicEntity("list", saveEntity);
+		return new ResponseEntity<>(dynamicEntity,HttpStatus.OK);
 		// return "index";
 	}
 
@@ -243,15 +263,20 @@ public class DynamicFormController {
 	}
 	
 	@GetMapping("/client")
-	public @ResponseBody List<String> getClient(@RequestParam String client) {
-		System.out.println("printing the client :: " + client);
-		Map<String, List<String>> dataMap = new TreeMap<>();
-		dataMap.put("TSC", List.of("IGST:7", "CGST:8", "SES:9"));
-		dataMap.put("WIPRO", List.of("IGST:7", "CGST:8"));
-		
-
-		List<String> list = dataMap.get(client);
-		return list;
+	public @ResponseBody List<TaxItem> getClient(@RequestParam int clientId) {
+		System.out.println("printing the client :: " + clientId);
+		Client client = clientService.getClient(clientId);
+		System.out.println(client.getTaxItem());
+		/*
+		 * Map<String, List<String>> dataMap = new TreeMap<>(); dataMap.put("TSC",
+		 * List.of("IGST:7", "CGST:8", "SES:9")); dataMap.put("WIPRO", List.of("IGST:7",
+		 * "CGST:8"));
+		 * 
+		 * 
+		 * List<String> list = dataMap.get(client);
+		 */
+		 
+		return client.getTaxItem();
 	}
 	
 	@GetMapping("/purchaseorderitem")
@@ -291,8 +316,8 @@ public class DynamicFormController {
 		
 		System.out.println("printing the clientId :: " + clientId);
 		Map<String, List<String>> dataMap = new TreeMap<>();
-		dataMap.put("TSC", List.of("PO1:PO-1", "PO2:PO-2"));
-		dataMap.put("WIPRO", List.of("PO3:PO-3", "PO4:PO-4"));
+		dataMap.put("1", List.of("PO1:PO-1", "PO2:PO-2"));
+		dataMap.put("2", List.of("PO3:PO-3", "PO4:PO-4"));
 		List<String> list = dataMap.get(clientId);
 		return list;
 	}
@@ -415,4 +440,31 @@ public class DynamicFormController {
 		return "deleted";
 	}
 
+	private class DynamicEntity{
+		private String redirectLocation;
+		private Object saveEntity;
+		public DynamicEntity(String redirectLocation, Object saveEntity) {
+			super();
+			this.redirectLocation = redirectLocation;
+			this.saveEntity = saveEntity;
+		}
+		public String getRedirectLocation() {
+			return redirectLocation;
+		}
+		public void setRedirectLocation(String redirectLocation) {
+			this.redirectLocation = redirectLocation;
+		}
+		public Object getSaveEntity() {
+			return saveEntity;
+		}
+		public void setSaveEntity(Object saveEntity) {
+			this.saveEntity = saveEntity;
+		}
+		@Override
+		public String toString() {
+			return "DynamicEntity [redirectLocation=" + redirectLocation + ", saveEntity=" + saveEntity + "]";
+		}
+		
+		
+	}
 }

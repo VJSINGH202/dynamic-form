@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@EntityScan( basePackages = {"io.jetform.core.entity"})
+@EntityScan( basePackages = {"io.jetform.core.entity","com.adject.dynamicform.model"})
 @ComponentScan(basePackages = {"com.adject.dynamicform","io.jetform.core"})
 public class DynamicFormApplication {
 

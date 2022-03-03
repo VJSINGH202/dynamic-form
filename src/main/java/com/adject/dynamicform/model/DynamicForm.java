@@ -1,4 +1,4 @@
-package com.adject.dynamicform.modal;
+package com.adject.dynamicform.model;
 
 public class DynamicForm {
 	

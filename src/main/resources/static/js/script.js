@@ -92,7 +92,7 @@ const form = function(form, className) {
 	if (formTemplate !== "") {
 		createTemplateForm(groups);
 	} else {
-		var htmlform = createCardForm(form, className);
+		var htmlform = createCardForm(form, className,'#jet-form');
 		if (groups === undefined || groups.length == 0) {
 			// array empty or does not exist
 			createFormFields(elements, htmlform);
@@ -107,9 +107,9 @@ const form = function(form, className) {
 	//  onFormSubmit(action,form,className);
 }
 
-const createCardForm = function(form, className) {
+const createCardForm = function(form, className,elementToAppend) {
 	var action = getFormAction(form.actions);
-	var card = $('<div/>', { class: 'card' }).appendTo('#jet-form');
+	var card = $('<div/>', { class: 'card' }).appendTo(elementToAppend);
 	var cardHeader = $('<div/>', { class: 'card-header text-white bg-primary' }).appendTo(card);
 	createCardHeader(className, form.title).appendTo(cardHeader);
 	//createCardHeader.appendTo(cardHeader);
@@ -144,17 +144,25 @@ const createTemplateFormFields = function(group) {
 	$.each(elements, function(key, val) {
 		console.log("each value: ");
 		console.log(val);
-		const col = $('<div/>', { class: 'col-sm-' + cols_size }).appendTo(row);
 		var result = checkInputType(val);
-		if (result !== null) {
-			if (Array.isArray(result)) {
-				$.each(result, function(key, val) {
-					val.appendTo(col);
-				});
-			} else {
-				result.appendTo(col);
-			}
+		if(val.fieldType === 'HIDDEN'){
+			console.log('inside hidden field');
+			result.appendTo(row);
+		}else{
+			console.log('not hidden field');
+			const col = $('<div/>', { class: 'col-sm-' + cols_size }).appendTo(row);
+			if (result !== null) {
+				if (Array.isArray(result)) {
+					$.each(result, function(key, val) {
+						val.appendTo(col);
+					});
+				} else {
+					result.appendTo(col);
+				}
+		    }
 		}
+
+		
 
 	});
 };
@@ -179,18 +187,22 @@ const createGroupFormFields = function(group, form) {
 	$.each(elements, function(key, val) {
 		console.log("each value: ");
 		console.log(val);
-		const col = $('<div/>', { class: 'col-sm-' + cols_size }).appendTo(row);
 		var result = checkInputType(val);
-		if (result !== null) {
-			if (Array.isArray(result)) {
-				$.each(result, function(key, val) {
-					val.appendTo(col);
-				});
-			} else {
-				result.appendTo(col);
-			}
+		if(val.fieldType === 'HIDDEN'){
+			console.log('inside hidden field');
+			result.appendTo(row);
+		}else{
+			const col = $('<div/>', { class: 'col-sm-' + cols_size }).appendTo(row);
+			if (result !== null) {
+				if (Array.isArray(result)) {
+					$.each(result, function(key, val) {
+						val.appendTo(col);
+					});
+				} else {
+					result.appendTo(col);
+				}
+		    }
 		}
-
 	});
 }
 
@@ -425,7 +437,7 @@ const formValidation = function(elements, form) {
 				success: function(data) {
 					console.log("response after submit")
 					console.log(data);
-					if (data == 'list') {
+					if (data.redirectLocation == 'list') {
 						var className = $("[name='className']").val();
 						console.log("Printing the className : " + className);
 						onModelClose();
@@ -1133,7 +1145,16 @@ const selectInput = function(element) {
 	var label = $('<label/>', { for: element.id, class: 'form-label' }).text(element.label);
 	label.appendTo(inputWrapper);
 	//form-select
-	var selectInput = $('<select/>').attr({ class: 'chosen-select form-select ' + cssClass, name: element.name, 'data-placeholder': element.placeHolder, placeholder: element.placeHolder, readonly: readOnly, disabled: disabled, multiple: multiple }).appendTo(inputWrapper);
+	let elementName = element.name;
+	if(element?.relationWrapper?.keyField){
+		console.log(element);
+		console.log(`elementName : ${elementName}`);
+		console.log(`element.name : ${element.name}`);
+		elementName = `${elementName}.${element?.relationWrapper?.keyField}`
+		console.log(`elementName after : ${elementName}`);
+	}
+	
+	var selectInput = $('<select/>').attr({ class: 'chosen-select form-select ' + cssClass, name: elementName, 'data-placeholder': element.placeHolder, placeholder: element.placeHolder, readonly: readOnly, disabled: disabled, multiple: multiple }).appendTo(inputWrapper);
 	//var seletedOption = $('<option/>', {selected : 'selected'}).text(element.placeHolder).appendTo(selectInput);
 
 	//$(selectInput).searchit({textFieldClass:'form-control', noElementText:"No matches"});
@@ -1587,62 +1608,239 @@ const formInput = function(element) {
 
 	if (element.relation === 'ONE_TO_MANY') {
 		console.log(':::: Rendering the ONE_TO_MANY ::::');
-		var table = $('<table/>', { class: 'table table-bordered' }).appendTo(inputWrapper);
-		var formElement = element.jetFormWrapper.elements;
-		var tHead = $('<thead/>').appendTo(table);
-		var tHeadRow = $('<tr/>').appendTo(tHead);
-		const filterElement = formElement.filter(e => { return e.fieldType !== 'HIDDEN' && e.fieldType !== 'FORM' });
-		$.each(filterElement, function(e, v) {
-			console.log(`:::::::::: printing the table headers :::::`);
-			console.log(v.label);
-			$('<th/>').text(v.label).appendTo(tHeadRow);
-		});
-
-		$.each(formElement, function(e, v) {
-			console.log(`before name change :: ${JSON.stringify(v.name)}`);
-			var ee = $(this).attr('name', element.name + '[0].' + $(this).attr('name'));
-			console.log(`after name change :: ${JSON.stringify(v.name)}`);
-		});
-
-		var tBody = $('<tbody/>').appendTo(table);
-		var tBodyRow = $('<tr/>').appendTo(tBody);
-		createOneToManyFormFields(formElement, tBodyRow);
-		var allLabel = $(tBodyRow).find('label');
-		console.log(':::: printing the label  :::::::');
-		console.log(allLabel);
-		$.each(allLabel, function(e, v) {
-			console.log(`hiding label element`);
-			console.log(v);
-			$(v).css('display', 'none');
-		});
-
-		var addRow = $('<button/>', { class: 'btn btn-sm btn-outline-primary', type: 'button' }).html('<i class="fa fa-plus"></i>');
-		var deleteRow = $('<button/>', { class: 'btn btn-sm btn-outline-danger', type: 'button' }).html('<i class="fa fa-minus"></i>');
-
-		$(table).before(addRow);
-		$(table).before(deleteRow);
-		addRowOnclick(addRow, table);
-		deleteRowOnclick(deleteRow, table);
-	} else {
+		var formElement = oneToManyForm(inputWrapper, element);
+	}else if(element.relation === 'MANY_TO_ONE'){
+		console.log(':::: Rendering the MANY_TO_ONE ::::');
+		manyToOneForm(inputWrapper, element)
+	}
+	 else {
 		console.log(':::: Rendering the ONE_TO_ONE ::::');
-		var fieldset = $('<fieldset/>', { class: "border p-2" }).appendTo(inputWrapper);
-		var legend = $('<legend/>', { class: 'float-none w-auto p-2' }).text(element.label).appendTo(fieldset);
-
-		console.log(`Printing the form elements`);
-		var formElement = element.jetFormWrapper.elements;
-		console.log(element.formClass);
-		//element.jetFormWrapper.elements
-		$.each(formElement, function(e, v) {
-			console.log(`before name change :: ${JSON.stringify(v.name)}`);
-			var ee = $(this).attr('name', element.name + '.' + $(this).attr('name'));
-			console.log($(this));
-			console.log(`after name change :: ${JSON.stringify(v.name)}`);
-		});
-		console.log(`changed name change :: ${JSON.stringify(element.jetFormWrapper.elements)}`);
-		createFormFields(formElement, fieldset);
+		var formElement = oneToOneForm(inputWrapper, element, formElement);
 	}
 
 	return inputWrapper;
+}
+
+function manyToOneForm(inputWrapper, element){
+	var element = element;
+	var readOnly = element.readOnly ? 'readonly' : false;
+	var disabled = element.disabled ? 'disabled' : false;
+	var cssClass = 'hidden-' + element.name;
+    cssClass = formatNestedClasses(cssClass);
+    
+	var hiddenId = element.value === '' ? 0 : element.value;
+	console.log('Printing the hidden value : ' + element.value);
+	console.log('Printing the Hidden Id : ' + hiddenId);
+	console.log('Printing the Condition : ' + (element.id === ''));
+	var hiddenInput = $('<input/>').attr({ type: 'hidden', class: cssClass, id: element.id, name: element.name+'.id', placeholder: element.placeHolder, value: hiddenId, readonly: readOnly, disabled: disabled });
+	hiddenInput.attr('fk','fk');
+	hiddenInput.appendTo(inputWrapper);
+}
+
+
+function oneToManyForm(inputWrapper, element) {
+	
+    var table = $('<table/>', { class: 'table table-bordered' }).appendTo(inputWrapper);
+    var tBody = $('<tbody/>').appendTo(table);
+    var formElement = element.jetFormWrapper.elements;
+    let form = element.jetFormWrapper;
+    let actions = element.jetFormWrapper.actions;
+    var action = getFormAction(actions);
+    if(element?.inline){
+	 //  alert('inline ::: '+element?.inline);
+	 let modelId = "#modal-".concat(element.name);
+	 let modelIdName = "modal-".concat(element.name);
+	 let modalButton = $('<button/>',{class:'btn btn-primary',type:'button'}).html('<i class="fa fa-plus"></i>');
+	     modalButton.attr( {"data-bs-toggle":"modal","data-bs-target":modelId} ).appendTo(inputWrapper);
+	 $(table).before(modalButton);
+	 let modal = $('<div/>',{class:'modal fade',id : modelIdName}).appendTo(inputWrapper);
+	 let modalDialog =  $('<div/>',{class:'modal-dialog modal-lg'}).appendTo(modal);
+	 let modalContent = $('<div/>',{class:'modal-content'}).appendTo(modalDialog);
+	 let modalHeader = $('<div/>',{class:'modal-header'}).appendTo(modalContent);
+	 let modalBody = $('<div/>',{class:'modal-body'}).appendTo(modalContent);
+	 let modalForm = $('<form/>', { action: action.name, method: 'POST', id: form.id, name: form.name }).appendTo(modalBody);
+	 
+	 let modalTitle = $('<h5/>',{class:'modal-title'}).text(element.label).appendTo(modalHeader);
+	 let modalCloseButton = $('<button/>',{class:'btn-close',type:'button'});
+	 modalCloseButton.attr("data-bs-dismiss","modal").appendTo(modalHeader);
+	 
+	 $('<input/>',{name:'className', value:element.formClass, type:'hidden'}).appendTo(modalForm);
+	 createFormFields(formElement, modalForm);
+	 var action = getFormAction(actions);
+		createSubmitButton(action, modalForm);
+		const headerElement = createTableHeader(table, formElement);
+		const modelTable = {table:table,headerElement:headerElement};
+		createModelFormSubmit(modalForm,modelTable);
+	 return formElement;
+    }
+    
+    createTableHeader(table, formElement);
+    alterFormNameAttributes(formElement, element);
+
+    
+    var tBodyRow = $('<tr/>').appendTo(tBody);
+    
+    createOneToManyFormFields(formElement, tBodyRow);
+    
+    var allLabel = $(tBodyRow).find('label');
+    console.log(':::: printing the label  :::::::');
+    console.log(allLabel);
+    
+    hiddenNestedFormElementLabels(allLabel);
+    createTableActionButtons(table);
+    
+    return formElement;
+}
+
+const createModelFormSubmit = function(form,modelTable){
+	$(form).submit(function(e){
+	    console.log('inside createModelFormSubmit');
+	    console.log( form.attr("method") );
+	    e.preventDefault();
+        console.log( $(this).serialize() );
+        try {
+
+			console.log(form);
+			console.log(form[0]);
+			
+			let pid;
+			var urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.has('pid')) {
+				console.log(urlParams.get('pid'));
+				console.log("id: ")
+				console.log(urlParams.get('pid'));
+				pid = urlParams.get('pid');
+			}  
+			
+			console.log($(form))
+            console.log($(form).find('input[name="candidate.id"]'));
+			//let htmlForm = $(document).find(this);
+			let fk = $(form).find('input[fk="fk"]')
+			//let fk = form.find('input[fk="fk"]');
+			console.log('printing the fk element');
+			console.log(fk);
+			console.log('printing the PID '+pid);
+			  $(fk).val(pid);
+			  console.log($(fk).val());
+			var formData = new FormData(this);
+
+			console.log(...formData.entries());//it will print the list 
+			for (var p of formData) {
+				console.log(p);
+			}
+			
+			saveModalForm(form, formData,modelTable);
+
+		}
+		catch (error) {
+			console.log(error)
+		}
+        
+	});
+};
+
+function saveModalForm(form, formData, modelTable) {
+    $.ajax({
+        type: form.attr("method"),
+        url: form.attr("action"),
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(data) {
+            console.log("response after submit");
+            console.log(data);
+            if (data.redirectLocation === 'list') {
+                var className = $("[name='className']").val();
+                console.log("Printing the className : " + className);
+                //onModelClose();
+                $(form)[0].reset();
+               let modelContent = $(form).closest('div.modal-content');
+               console.log(modelContent);
+               let closeBtn = $(modelContent).find('button.btn-close');
+               console.log(closeBtn);
+               $(closeBtn).click();
+                //$(form).find(".btn-close").click();
+                //window.location.href = '/dynamic/list?className=' + className;
+                appendTable(modelTable, data.saveEntity);
+            }
+        },
+        error: function(data) {
+
+            console.log('PRinting error');
+            console.log(data);
+        }
+    });
+}
+
+function appendTable (modelTable,entity){
+	const table = modelTable.table;
+	let tBody = $(table).find('tbody');
+	console.log(tBody);
+	const headerElement = modelTable.headerElement;
+	const tr = $('<tr/>').appendTo(tBody);
+	$.each(headerElement,function(e,v){
+		$('<td/>').text(entity[v]).appendTo(tr);
+	});
+}
+
+function createTableHeader(table, formElement) {
+	let header = [];
+    var tHead = $('<thead/>').appendTo(table);
+    var tHeadRow = $('<tr/>').appendTo(tHead);
+    const filterElement = formElement.filter(e => { return e.fieldType !== 'HIDDEN' && e.fieldType !== 'FORM'; });
+    $.each(filterElement, function(e, v) {
+        console.log(`:::::::::: printing the table headers :::::`);
+        console.log(v.label);
+        header.push(v.name);
+        $('<th/>').text(v.label).appendTo(tHeadRow);
+    });
+    return header;
+}
+
+function hiddenNestedFormElementLabels(allLabel) {
+    $.each(allLabel, function(e, v) {
+        console.log(`hiding label element`);
+        console.log(v);
+        $(v).css('display', 'none');
+    });
+}
+
+function alterFormNameAttributes(formElement, element) {
+    $.each(formElement, function(e, v) {
+        console.log(`before name change :: ${JSON.stringify(v.name)}`);
+        var ee = $(this).attr('name', element.name + '[0].' + $(this).attr('name'));
+        console.log(`after name change :: ${JSON.stringify(v.name)}`);
+    });
+}
+
+function createTableActionButtons(table) {
+    var addRow = $('<button/>', { class: 'btn btn-sm btn-outline-primary', type: 'button' }).html('<i class="fa fa-plus"></i>');
+    var deleteRow = $('<button/>', { class: 'btn btn-sm btn-outline-danger', type: 'button' }).html('<i class="fa fa-minus"></i>');
+
+    $(table).before(addRow);
+    $(table).before(deleteRow);
+    addRowOnclick(addRow, table);
+    deleteRowOnclick(deleteRow, table);
+}
+
+function oneToOneForm(inputWrapper, element, formElement) {
+    
+    var fieldset = $('<fieldset/>', { class: "border p-2" }).appendTo(inputWrapper);
+    var legend = $('<legend/>', { class: 'float-none w-auto p-2' }).text(element.label).appendTo(fieldset);
+
+    console.log(`Printing the form elements`);
+    var formElement = element.jetFormWrapper.elements;
+    console.log(element.formClass);
+    //element.jetFormWrapper.elements
+    $.each(formElement, function(e, v) {
+        console.log(`before name change :: ${JSON.stringify(v.name)}`);
+        var ee = $(this).attr('name', element.name + '.' + $(this).attr('name'));
+        console.log($(this));
+        console.log(`after name change :: ${JSON.stringify(v.name)}`);
+    });
+    console.log(`changed name change :: ${JSON.stringify(element.jetFormWrapper.elements)}`);
+    createFormFields(formElement, fieldset);
+    return formElement;
 }
 
 const addRowOnclick = function(addRowButton, table) {
@@ -1805,6 +2003,10 @@ const templateInput = function(element) {
 	var inputWrapper = $('<div/>', { class: 'mb-3' });
 	var label = $('<label/>', { for: element.id, class: 'form-label' }).text(element.label);
 	label.appendTo(inputWrapper);
+	
+	var cssClass = 'email-' + element.name;
+	cssClass = formatNestedClasses(cssClass);
+	checkSubscribeEvents(element.subscribeEvents, cssClass);
 	console.log(element.filePath);
 	// $.get(element.filePath)
 	// $.get('resource',{ fileName: element.filePath})
@@ -1863,6 +2065,8 @@ const textAreaInput = function(element) {
 	return inputWrapper;
 };
 
+
+
 function onClientChangeRefreshPOI(obj) {
 
 	const clientId = $(obj).val();
@@ -1878,6 +2082,40 @@ function onClientChange1(poi) {
 function test(source){
 	alert("source :: " + source);
 	console.log('inside script.js ::: '+source);
+}
+
+function onClientChange10(source){
+	const clientId = $(source).val();
+    console.log('Printing the clientId (onClientChange(source):inside script.js) :: '+clientId);
+    $.ajax({
+			type:'GET',
+			url:'/dynamic/client',
+			data: {'clientId' : clientId},
+			success:function(data){
+				console.log("printing the client :::: ")
+				console.log(data);
+				 $('#client-tax').empty();
+				var taxRow =$('<div/>',{class:'mb-3 row'}).appendTo('#client-tax');
+				$.each(data,function(key,tax){
+					
+					//console.log("labelText :- "+labelText +" value :- "+value);
+					var taxCol =$('<div/>',{class:'col-auto'}).appendTo(taxRow);
+
+	                $('<label/>',{class:'col-form-label'}).text(tax.name+'('+tax.amount+'%)').appendTo(taxCol);
+	                let invoiceTaxName = `invoiceTax[${key}].amount`;
+	                let invoiceTaxId = `invoiceTax[${key}].id`;
+	                let invoiceTax_TaxItemId = `invoiceTax[${key}].taxItem.id`;
+                   $('<input/>',{class:'form-control tax',type:'number',name : invoiceTaxName,rate : tax.amount,readonly:true}).appendTo(taxCol);
+                   $('<input/>',{type:'hidden', name:invoiceTaxId }).appendTo(taxCol);
+                   $('<input/>',{type:'hidden', name:invoiceTax_TaxItemId, value:tax.id}).appendTo(taxCol);
+					
+				});
+			},
+			error:function(data){
+				console.log(data)
+			}
+			
+		});
 }
 
 function onPurchaseOrderChangeRefreshPOI(source){

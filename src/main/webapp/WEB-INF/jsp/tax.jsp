@@ -4,9 +4,9 @@
 <script>
 
 $(document).ready(function(){
-	onClientChange();
+	//onClientChange();
 	//calculateClientTax();
-	calculateSubTotal();
+	//calculateSubTotal();
 });
 
 function calculateSubTotal(){

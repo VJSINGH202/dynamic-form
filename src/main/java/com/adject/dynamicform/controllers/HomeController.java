@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.adject.dynamicform.modal.DynamicForm;
+import com.adject.dynamicform.model.DynamicForm;
 
 @Controller
 public class HomeController {

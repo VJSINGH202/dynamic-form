@@ -239,7 +239,6 @@ function checkAll(event){
 
 	function getListV2(header,table,option,filter){
 		//console.log("name:"+className);	
-		
 		var table = table;
 		console.log(table);
 		$.ajax({
